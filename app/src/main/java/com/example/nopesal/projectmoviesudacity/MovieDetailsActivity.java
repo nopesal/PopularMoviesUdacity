@@ -35,17 +35,17 @@ public class MovieDetailsActivity extends AppCompatActivity {
         mMovieDetailsPoster = (ImageView) findViewById(R.id.movie_details_poster);
 
         Movie movie = getIntent().getExtras().getParcelable("Movie");
-        mMovieDetailsTitle.setText(movie.getTitle());
-        mMovieDetailsReleaseDate.setText(movie.getReleaseDate());
-        mMovieDetailsRating.setText(movie.getRating());
-        mMovieDetailsSynopsis.setText(movie.getSynopsis());
-
         String posterPath = MovieDatabase.getHDPosterURL(movie.getPosterPath());
         Picasso.with(getApplicationContext()).load(posterPath).into(mMovieDetailsPoster,
                 PicassoPalette.with(posterPath, mMovieDetailsPoster)
                         .use(PicassoPalette.Profile.VIBRANT)
                         .intoBackground(mMovieDetailsPanel)
         );
+        mMovieDetailsTitle.setText(movie.getTitle());
+        mMovieDetailsReleaseDate.setText(movie.getReleaseDate());
+        mMovieDetailsRating.setText(movie.getRating());
+        mMovieDetailsSynopsis.setText(movie.getSynopsis());
+
 
         mMovieDetailsPoster.setOnClickListener(new View.OnClickListener() {
             @Override

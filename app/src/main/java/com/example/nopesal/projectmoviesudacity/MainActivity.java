@@ -29,6 +29,10 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<Movie> mMovieArrayList;
     public String mOrder = "popular";
 
+    public interface AsyncTaskCompleteListener<T> {
+        public void onTaskCompleted(T result);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
         mGridView = (GridView) findViewById(R.id.movie_grid_view);
         mConnectionErrorMessage = (TextView) findViewById(R.id.connection_error_message);
-        new PopularMoviesTask().execute(mOrder);
+        new PopularMoviesTask(this, new PopularMoviesTaskCompletedListener()).execute(mOrder);
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -46,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        if (!isNetworkAvailable()){
+        if (!isNetworkAvailable()) {
             mConnectionErrorMessage.setVisibility(View.VISIBLE);
         }
     }
@@ -67,9 +71,9 @@ public class MainActivity extends AppCompatActivity {
                 item.setTitle("Top Rated");
                 mOrder = "top_rated";
             }
-            new PopularMoviesTask().execute(mOrder);
+            new PopularMoviesTask(this, new PopularMoviesTaskCompletedListener()).execute(mOrder);
         }
-        if (isNetworkAvailable()){
+        if (isNetworkAvailable()) {
             mConnectionErrorMessage.setVisibility(View.GONE);
         } else {
             mConnectionErrorMessage.setVisibility(View.VISIBLE);
@@ -89,21 +93,10 @@ public class MainActivity extends AppCompatActivity {
         return isAvailable;
     }
 
-    public class PopularMoviesTask extends AsyncTask<String, Void, ArrayList<Movie>> {
-        @Override
-        protected ArrayList<Movie> doInBackground(String... order) {
-            MovieDatabase movieDatabase = new MovieDatabase();
-            ArrayList<Movie> movieArrayList = new ArrayList<>();
-            try {
-                movieArrayList = movieDatabase.getMoviesArray(mOrder);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return movieArrayList;
-        }
+    public class PopularMoviesTaskCompletedListener implements AsyncTaskCompleteListener<ArrayList<Movie>> {
 
         @Override
-        protected void onPostExecute(ArrayList<Movie> movies) {
+        public void onTaskCompleted(ArrayList<Movie> movies) {
             mMovieArrayList = movies;
             MovieGridAdapter adapter = new MovieGridAdapter(getApplicationContext(), mMovieArrayList);
             mGridView.setAdapter(adapter);
