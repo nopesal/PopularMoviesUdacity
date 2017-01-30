@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    tools:context="com.example.nopesal.projectmoviesudacity.MainActivity">
+
+    <GridView
+        android:id="@+id/movie_grid_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:horizontalSpacing="4dp"
+        android:numColumns="@integer/number_of_columns_main_activity"
+        android:verticalSpacing="4dp">
+
+    </GridView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:id="@+id/connection_error_message"
+        android:text="@string/connection_error"
+        android:textColor="@color/white"
+        android:visibility="gone"/>
+</RelativeLayout>

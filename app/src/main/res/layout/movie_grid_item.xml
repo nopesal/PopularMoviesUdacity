@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:weightSum="1">
+
+    <ImageView
+        android:id="@+id/movie_grid_item_poster"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:padding="@dimen/two_line_grid_padding"
+        android:id="@+id/movie_grid_item_details"
+        android:background="@color/colorAccent">
+
+        <TextView
+            android:id="@+id/movie_grid_item_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/white"
+            android:textSize="@dimen/two_line_grid_first_line_text_size"
+            android:textStyle="bold"
+            tools:text="Finding Dory"/>
+
+        <TextView
+            android:id="@+id/movie_grid_item_year"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="@dimen/two_line_grid_second_line_text_size"
+            tools:text="2016"/>
+
+    </LinearLayout>
+</FrameLayout>

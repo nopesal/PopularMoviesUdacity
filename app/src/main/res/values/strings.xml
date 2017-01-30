@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Project Movies Udacity</string>
+    <string name="sort_order">Most Popular</string>
+    <string name="connection_error">There is no network connection.</string>
+    <string name="synopsis">SYNOPSIS</string>
+    <string name="rating">RATING</string>
+    <string name="release_date">RELEASE DATE</string>
+</resources>
