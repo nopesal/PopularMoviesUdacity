@@ -4,7 +4,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="two_line_grid_padding">16dp</dimen>
-    
+
     <dimen name="movie_details_title_text_size">28sp</dimen>
     <dimen name="two_line_grid_first_line_text_size">16sp</dimen>
     <dimen name="two_line_grid_second_line_text_size">12sp</dimen>

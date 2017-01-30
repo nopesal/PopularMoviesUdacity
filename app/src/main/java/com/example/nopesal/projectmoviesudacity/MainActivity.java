@@ -1,21 +1,22 @@
 package com.example.nopesal.projectmoviesudacity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.TextView;
 
 import com.example.nopesal.projectmoviesudacity.adapters.MovieGridAdapter;
 import com.example.nopesal.projectmoviesudacity.database.MovieDatabase;
+import com.example.nopesal.projectmoviesudacity.itemdecorations.ItemSpacingDecoration;
 import com.example.nopesal.projectmoviesudacity.utils.Movie;
 
 import java.io.IOException;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    public GridView mGridView;
+    public RecyclerView mGridRecyclerView;
     public TextView mConnectionErrorMessage;
 
     public ArrayList<Movie> mMovieArrayList;
@@ -34,18 +35,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mGridView = (GridView) findViewById(R.id.movie_grid_view);
+        mGridRecyclerView = (RecyclerView) findViewById(R.id.movie_grid_recycler_view);
         mConnectionErrorMessage = (TextView) findViewById(R.id.connection_error_message);
+
+        mGridRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        mGridRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mGridRecyclerView.addItemDecoration(new ItemSpacingDecoration(12, 2, false));
         new PopularMoviesTask().execute(mOrder);
-        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Movie movie = mMovieArrayList.get(i);
-                Intent intent = new Intent(getApplicationContext(), MovieDetailsActivity.class);
-                intent.putExtra("Movie", movie);
-                startActivity(intent);
-            }
-        });
         if (!isNetworkAvailable()){
             mConnectionErrorMessage.setVisibility(View.VISIBLE);
         }
@@ -105,8 +101,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<Movie> movies) {
             mMovieArrayList = movies;
-            MovieGridAdapter adapter = new MovieGridAdapter(getApplicationContext(), mMovieArrayList);
-            mGridView.setAdapter(adapter);
+            mGridRecyclerView.setAdapter(new MovieGridAdapter(getApplicationContext(), movies));
         }
     }
 }
