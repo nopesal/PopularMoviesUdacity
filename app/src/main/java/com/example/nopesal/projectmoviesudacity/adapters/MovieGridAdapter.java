@@ -1,6 +1,8 @@
 package com.example.nopesal.projectmoviesudacity.adapters;
 
 import android.content.Context;
+import android.support.v7.graphics.Palette;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.nopesal.projectmoviesudacity.MainActivity;
 import com.example.nopesal.projectmoviesudacity.R;
 import com.example.nopesal.projectmoviesudacity.database.MovieDatabase;
 import com.example.nopesal.projectmoviesudacity.utils.Movie;
@@ -46,8 +49,8 @@ public class MovieGridAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        final ViewHolder viewHolder;
 
         if (convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.movie_grid_item, null);
@@ -66,11 +69,25 @@ public class MovieGridAdapter extends BaseAdapter {
         String posterPath = MovieDatabase.getSDPosterURL(mMovieArray.get(position).getPosterPath());
         Picasso.with(mContext).load(posterPath).into(viewHolder.mMovieGridItemPoster,
                 PicassoPalette.with(posterPath, viewHolder.mMovieGridItemPoster)
-                        .use(PicassoPalette.Profile.VIBRANT)
-                        .intoBackground(viewHolder.mMovieGridItemDetails)
+                        .intoCallBack(new PicassoPalette.CallBack() {
+                            @Override
+                            public void onPaletteLoaded(Palette palette) {
+                                try {
+                                    int vibrantColor = palette.getVibrantSwatch().getRgb();
+                                    mMovieArray.get(position).setVibrantColor(vibrantColor);
+                                    viewHolder.mMovieGridItemDetails.setBackgroundColor(vibrantColor);
+                                    Log.i("PELICULAS", "[Pelicula: " + mMovieArray.get(position).getTitle() +", Color: " + mMovieArray.get(position).getVibrantColor() + "]");
+                                } catch (NullPointerException ignored) {
+                                }
+                            }
+                        })
         );
 
         return convertView;
+    }
+
+    public ArrayList<Movie> getMovieArrayWithColors() {
+        return mMovieArray;
     }
 
     private static class ViewHolder {

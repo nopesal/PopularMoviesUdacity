@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +22,9 @@ import com.example.nopesal.projectmoviesudacity.utils.Movie;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,6 +43,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/Montserrat-Regular.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build()
+        );
+
         mGridView = (GridView) findViewById(R.id.movie_grid_view);
         mConnectionErrorMessage = (TextView) findViewById(R.id.connection_error_message);
         new PopularMoviesTask(this, new PopularMoviesTaskCompletedListener()).execute(mOrder);
@@ -53,6 +64,11 @@ public class MainActivity extends AppCompatActivity {
         if (!isNetworkAvailable()) {
             mConnectionErrorMessage.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     @Override
@@ -94,11 +110,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public class PopularMoviesTaskCompletedListener implements AsyncTaskCompleteListener<ArrayList<Movie>> {
-
         @Override
         public void onTaskCompleted(ArrayList<Movie> movies) {
             mMovieArrayList = movies;
-            MovieGridAdapter adapter = new MovieGridAdapter(getApplicationContext(), mMovieArrayList);
+            final MovieGridAdapter adapter = new MovieGridAdapter(getApplicationContext(), mMovieArrayList);
             mGridView.setAdapter(adapter);
         }
     }

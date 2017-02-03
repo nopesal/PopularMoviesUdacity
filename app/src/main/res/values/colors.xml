@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#00838f</color>
     <color name="white">#FFFFFF</color>
+    <color name="defaultColorForMovies">#FACD2A</color>
+    <color name="watchTrailerButtonColor">#AD463A</color>
 </resources>

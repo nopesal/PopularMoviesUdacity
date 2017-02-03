@@ -13,13 +13,23 @@ public class Movie implements Parcelable {
     private String rating;
     private String releaseDate;
     private String posterPath;
+    private int vibrantColor;
 
-    public Movie(String title, String synopsis, String rating, String releaseDate, String posterPath) {
+    public Movie(String title, String synopsis, String rating, String releaseDate, String posterPath, int vibrantColor) {
         this.title = title;
         this.synopsis = synopsis;
         this.rating = rating;
         this.releaseDate = releaseDate;
         this.posterPath = posterPath;
+        this.vibrantColor = vibrantColor;
+    }
+
+    public int getVibrantColor() {
+        return vibrantColor;
+    }
+
+    public void setVibrantColor(int vibrantColor) {
+        this.vibrantColor = vibrantColor;
     }
 
     public String getTitle() {
@@ -42,12 +52,14 @@ public class Movie implements Parcelable {
         return posterPath;
     }
 
-    private Movie(Parcel in) {
+
+    protected Movie(Parcel in) {
         title = in.readString();
         synopsis = in.readString();
         rating = in.readString();
         releaseDate = in.readString();
         posterPath = in.readString();
+        vibrantColor = in.readInt();
     }
 
     @Override
@@ -62,6 +74,7 @@ public class Movie implements Parcelable {
         dest.writeString(rating);
         dest.writeString(releaseDate);
         dest.writeString(posterPath);
+        dest.writeInt(vibrantColor);
     }
 
     @SuppressWarnings("unused")
