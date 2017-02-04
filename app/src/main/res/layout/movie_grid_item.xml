@@ -20,7 +20,7 @@
         android:orientation="vertical"
         android:padding="@dimen/two_line_grid_padding"
         android:id="@+id/movie_grid_item_details"
-        android:background="@color/colorAccent">
+        android:background="@color/defaultColorForMovies">
 
         <TextView
             android:id="@+id/movie_grid_item_title"

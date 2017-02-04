@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Movie movie = mMovieArrayList.get(i);
+                Log.i("MOVIEID", "onItemClick: " + movie.getId());
                 Intent intent = new Intent(getApplicationContext(), MovieDetailsActivity.class);
                 intent.putExtra("Movie", movie);
                 startActivity(intent);

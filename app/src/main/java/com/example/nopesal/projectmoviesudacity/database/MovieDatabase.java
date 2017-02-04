@@ -1,6 +1,7 @@
 package com.example.nopesal.projectmoviesudacity.database;
 
 import android.net.Uri;
+import android.util.Log;
 
 import com.example.nopesal.projectmoviesudacity.BuildConfig;
 import com.example.nopesal.projectmoviesudacity.utils.Movie;
@@ -36,6 +37,7 @@ public class MovieDatabase {
             for (int i = 0; i < moviesJSON.length(); i++) {
                 JSONObject movieJSON = (JSONObject) moviesJSON.get(i);
                 Movie movie = new Movie(
+                        movieJSON.getInt("id"),
                         movieJSON.getString("title"),
                         movieJSON.getString("overview"),
                         movieJSON.getString("vote_average"),
@@ -57,7 +59,7 @@ public class MovieDatabase {
                 .authority(POSTER_BASE_URL)
                 .appendPath("t")
                 .appendPath("p")
-                .appendPath("w185");
+                .appendPath("w342");
         return builder.build().toString() + posterPath;
     }
 
@@ -67,7 +69,7 @@ public class MovieDatabase {
                 .authority(POSTER_BASE_URL)
                 .appendPath("t")
                 .appendPath("p")
-                .appendPath("w342");
+                .appendPath("w500");
         return builder.build().toString() + posterPath;
     }
 
@@ -87,5 +89,35 @@ public class MovieDatabase {
                 .appendPath(order)
                 .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_TOKEN);
         return builder.build().toString();
+    }
+
+    private String generateCreditsURL(String id) {
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme("https")
+                .authority(BASE_URL)
+                .appendPath(API_VERSION)
+                .appendPath(TYPE_MOVIE)
+                .appendPath(id)
+                .appendPath("credits")
+                .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_TOKEN);
+        return builder.build().toString();
+    }
+
+    public String getDirectorFromMovie(int id) throws IOException {
+        String url = generateCreditsURL(String.valueOf(id));
+        String apiResponseJSON = getJSONFromApi(url);
+        Log.i("CREDITS", "getDirectorFromMovie: "+ url);
+
+        try {
+            JSONArray crewArray = new JSONObject(apiResponseJSON).getJSONArray("crew");
+            for (int i = 0; i < crewArray.length(); i++) {
+                JSONObject crew = (JSONObject) crewArray.get(i);
+                if (crew.getString("job").equalsIgnoreCase("Director")) {
+                    return crew.getString("name");
+                }
+            }
+        } catch (JSONException ignored) {
+        }
+        return null;
     }
 }

@@ -76,7 +76,6 @@ public class MovieGridAdapter extends BaseAdapter {
                                     int vibrantColor = palette.getVibrantSwatch().getRgb();
                                     mMovieArray.get(position).setVibrantColor(vibrantColor);
                                     viewHolder.mMovieGridItemDetails.setBackgroundColor(vibrantColor);
-                                    Log.i("PELICULAS", "[Pelicula: " + mMovieArray.get(position).getTitle() +", Color: " + mMovieArray.get(position).getVibrantColor() + "]");
                                 } catch (NullPointerException ignored) {
                                 }
                             }
