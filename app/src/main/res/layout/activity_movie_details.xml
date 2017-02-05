@@ -54,6 +54,7 @@
             android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/movie_details_panel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/defaultColorForMovies"
@@ -63,7 +64,7 @@
 
                 <TextView
                     android:id="@+id/movie_details_title"
-                    fontPath="fonts/Montserrat-Regular.ttf"
+                    fontPath="fonts/Montserrat-Bold.ttf"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
@@ -90,9 +91,9 @@
                         android:text="@string/directed_by"
                         android:textColor="#212121"
                         android:textStyle="bold"
-                        tools:visibility="visible"
                         android:visibility="gone"
-                        tools:ignore="MissingPrefix"/>
+                        tools:ignore="MissingPrefix"
+                        tools:visibility="visible"/>
 
                     <TextView
                         android:id="@+id/movie_details_director"
@@ -102,9 +103,9 @@
                         android:textColor="#212121"
                         android:textStyle="bold"
                         android:visibility="gone"
-                        tools:visibility="visible"
                         tools:ignore="MissingPrefix"
-                        tools:text="Andrew Stanton"/>
+                        tools:text="Andrew Stanton"
+                        tools:visibility="visible"/>
 
                     <TextView
                         android:id="@+id/movie_details_release_date"
@@ -130,7 +131,7 @@
                 <Button
                     android:id="@+id/movie_details_watch_trailer_button"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="35dp"
                     android:background="@drawable/watch_trailer_button_border"
                     android:drawableStart="@drawable/ic_play_arrow_24dp"
                     android:paddingEnd="16dp"
@@ -147,7 +148,7 @@
                 <Button
                     android:id="@+id/movie_details_favorite_button"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="35dp"
                     android:background="@drawable/favorite_button_border"
                     android:drawableStart="@drawable/ic_favorite_24dp"
                     android:paddingEnd="16dp"
@@ -157,6 +158,7 @@
             </LinearLayout>
 
             <View
+                android:id="@+id/movie_details_divider_1"
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:layout_marginTop="16dp"
@@ -173,6 +175,7 @@
                 tools:text="Buscando a Dory (en inglés, Finding Dory) es una película estadounidense en animación 3D por ordenador. Es la secuela de Buscando a Nemo y también está distribuida por Walt Disney Pictures, producida por Pixar y dirigida por Andrew Stanton, que dirigió la película original, y regresó como escritor y director, junto a Angus MacLane como el codirector."/>
 
             <View
+                android:id="@+id/movie_details_divider_2"
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:background="@color/defaultColorForMovies"/>

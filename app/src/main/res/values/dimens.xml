@@ -9,6 +9,6 @@
     <dimen name="two_line_grid_second_line_text_size">12sp</dimen>
 
     <!-- Movie Details screen dimensions -->
-    <dimen name="movie_details_title_text_size">28sp</dimen>
+    <dimen name="movie_details_title_text_size">22sp</dimen>
     <dimen name="movie_details_title_width">300dp</dimen>
 </resources>

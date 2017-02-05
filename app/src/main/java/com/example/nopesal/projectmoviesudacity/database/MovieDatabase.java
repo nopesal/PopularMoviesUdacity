@@ -42,8 +42,7 @@ public class MovieDatabase {
                         movieJSON.getString("overview"),
                         movieJSON.getString("vote_average"),
                         movieJSON.getString("release_date"),
-                        movieJSON.getString("poster_path"),
-                        0
+                        movieJSON.getString("poster_path")
                 );
                 moviesArray.add(movie);
             }

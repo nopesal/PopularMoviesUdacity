@@ -3,11 +3,14 @@ package com.example.nopesal.projectmoviesudacity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,6 +27,7 @@ import com.example.nopesal.projectmoviesudacity.adapters.MovieGridAdapter;
 import com.example.nopesal.projectmoviesudacity.database.MovieDatabase;
 import com.example.nopesal.projectmoviesudacity.utils.Movie;
 import com.github.florent37.picassopalette.PicassoPalette;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -40,6 +44,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
     public ImageView mMovieDetailsPoster;
     public CollapsingToolbarLayout mCollapsingToolbarLayout;
     public TextView mMovieDetailsDirector;
+    public LinearLayout mMovieDetailsPanel;
+    public View mDividerOne;
+    public View mDividerTwo;
+    public Button mFavoriteButton;
 
     public interface AsyncTaskCompleteListener<T> {
         public void onTaskCompleted(T result);
@@ -62,20 +70,62 @@ public class MovieDetailsActivity extends AppCompatActivity {
         mMovieDetailsPoster = (ImageView) findViewById(R.id.movie_details_poster);
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.movie_details_collapsing_toolbar_layout);
         mMovieDetailsDirector = (TextView) findViewById(R.id.movie_details_director);
-
+        mMovieDetailsPanel = (LinearLayout) findViewById(R.id.movie_details_panel);
+        mDividerOne = findViewById(R.id.movie_details_divider_1);
+        mDividerTwo = findViewById(R.id.movie_details_divider_2);
+        mFavoriteButton = (Button) findViewById(R.id.movie_details_favorite_button);
 
         final Movie movie = getIntent().getExtras().getParcelable("Movie");
         new DirectorTask(this, new DirectorTaskCompletedListener()).execute(movie.getId());
 
         String posterPath = MovieDatabase.getHDPosterURL(movie.getPosterPath());
-        Picasso.with(getApplicationContext()).load(posterPath).into(mMovieDetailsPoster);
+        Picasso.with(getApplicationContext()).load(posterPath).into(mMovieDetailsPoster, new Callback() {
+            @Override
+            public void onSuccess() {
+                Bitmap bitmap = ((BitmapDrawable) mMovieDetailsPoster.getDrawable()).getBitmap();
+                Palette palette  = Palette.from(bitmap).generate();
+                Palette.Swatch vibrantSwatch = palette.getVibrantSwatch();
+                if (vibrantSwatch != null) {
+                    applyPaletteColorToViews(vibrantSwatch);
 
+
+                } else {
+                    Palette.Swatch mutedSwatch = palette.getMutedSwatch();
+                    applyPaletteColorToViews(mutedSwatch);
+                }
+            }
+
+            @Override
+            public void onError() {
+                //Do nothing
+            }
+        });
 
         mMovieDetailsTitle.setText(movie.getTitle());
-        mMovieDetailsReleaseDate.setText(movie.getReleaseDate());
+        mMovieDetailsReleaseDate.setText(movie.getReleaseDate().substring(0, 4));
         mMovieDetailsSynopsis.setText(movie.getSynopsis());
 
         hideTitleWhenExpanded(movie);
+    }
+
+    private void applyPaletteColorToViews(Palette.Swatch swatch) {
+        mMovieDetailsPanel.setBackgroundColor(swatch.getRgb());
+        mMovieDetailsTitle.setTextColor(swatch.getBodyTextColor());
+        mMovieDetailsDirector.setTextColor(swatch.getBodyTextColor());
+        mMovieDetailsReleaseDate.setTextColor(swatch.getBodyTextColor());
+        mDividerOne.setBackgroundColor(swatch.getRgb());
+        mDividerTwo.setBackgroundColor(swatch.getRgb());
+        mFavoriteButton.setTextColor(swatch.getRgb());
+        mFavoriteButton.setCompoundDrawableTintList(ColorStateList.valueOf(swatch.getRgb()));
+        mCollapsingToolbarLayout.setContentScrimColor(swatch.getRgb());
+        setButtonBorderColor(swatch);
+    }
+
+    private void setButtonBorderColor(Palette.Swatch swatch) {
+        GradientDrawable gd = new GradientDrawable();
+        gd.setCornerRadius(7 * getResources().getDisplayMetrics().density);
+        gd.setStroke((int) (2 * getResources().getDisplayMetrics().density), swatch.getRgb());
+        mFavoriteButton.setBackground(gd);
     }
 
     private void showDirectorInPanel() {
@@ -87,6 +137,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     /**
      * Method that hides the Movie title from the interface when the Scroll View is expanded and
      * shows it when it's collapsed.
+     *
      * @param movie Object that contains the movie info
      */
     private void hideTitleWhenExpanded(final Movie movie) {
@@ -104,7 +155,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 if (scrollRange + verticalOffset == 0) {
                     mCollapsingToolbarLayout.setTitle(movie.getTitle());
                     isShow = true;
-                } else if(isShow) {
+                } else if (isShow) {
                     mCollapsingToolbarLayout.setTitle(" ");
                     isShow = false;
                 }
@@ -120,7 +171,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     public class DirectorTaskCompletedListener implements MovieDetailsActivity.AsyncTaskCompleteListener<String> {
         @Override
         public void onTaskCompleted(String director) {
-            if (director != null){
+            if (director != null) {
                 showDirectorInPanel();
                 mMovieDetailsDirector.setText(director);
             }
