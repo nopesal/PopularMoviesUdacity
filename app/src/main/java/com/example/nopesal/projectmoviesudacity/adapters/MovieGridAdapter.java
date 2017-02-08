@@ -1,6 +1,7 @@
 package com.example.nopesal.projectmoviesudacity.adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -63,11 +64,18 @@ public class MovieGridAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
+
+        Typeface nunitoBold = Typeface.createFromAsset(mContext.getAssets(),
+                "fonts/Nunito-Bold.ttf");
+        Typeface nunitoRegular = Typeface.createFromAsset(mContext.getAssets(),
+                "fonts/Nunito-Regular.ttf");
+        viewHolder.mMovieGridItemTitle.setTypeface(nunitoBold);
+        viewHolder.mMovieGridItemYear.setTypeface(nunitoRegular);
         viewHolder.mMovieGridItemTitle.setText(mMovieArray.get(position).getTitle());
         viewHolder.mMovieGridItemYear.setText(mMovieArray.get(position).getReleaseDate().substring(0, 4));
 
         String posterPath = MovieDatabase.getSDPosterURL(mMovieArray.get(position).getPosterPath());
-        Picasso.with(mContext).load(posterPath).into(viewHolder.mMovieGridItemPoster,
+        Picasso.with(mContext).load(posterPath).placeholder(R.drawable.movie_poster_placeholder).into(viewHolder.mMovieGridItemPoster,
                 PicassoPalette.with(posterPath, viewHolder.mMovieGridItemPoster)
                         .intoCallBack(new PicassoPalette.CallBack() {
                             @Override
@@ -86,10 +94,6 @@ public class MovieGridAdapter extends BaseAdapter {
         );
 
         return convertView;
-    }
-
-    public ArrayList<Movie> getMovieArrayWithColors() {
-        return mMovieArray;
     }
 
     private static class ViewHolder {

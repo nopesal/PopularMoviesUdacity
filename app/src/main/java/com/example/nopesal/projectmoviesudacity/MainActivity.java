@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/Montserrat-Regular.ttf")
+                .setDefaultFontPath("fonts/Nunito-Regular.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );

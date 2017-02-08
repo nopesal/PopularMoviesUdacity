@@ -1,9 +1,11 @@
 package com.example.nopesal.projectmoviesudacity;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.GradientDrawable;
@@ -18,6 +20,8 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -31,6 +35,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -47,7 +52,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
     public LinearLayout mMovieDetailsPanel;
     public View mDividerOne;
     public View mDividerTwo;
-    public Button mFavoriteButton;
+    public LinearLayout mFavoriteButton;
+    public ImageView mFavoriteButtonImage;
+    public TextView mFavoriteButtonText;
 
     public interface AsyncTaskCompleteListener<T> {
         public void onTaskCompleted(T result);
@@ -59,10 +66,21 @@ public class MovieDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movie_details);
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/Montserrat-Regular.ttf")
+                .setDefaultFontPath("fonts/Nunito-Regular.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.movie_details_toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
         mMovieDetailsTitle = (TextView) findViewById(R.id.movie_details_title);
         mMovieDetailsReleaseDate = (TextView) findViewById(R.id.movie_details_release_date);
@@ -73,7 +91,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
         mMovieDetailsPanel = (LinearLayout) findViewById(R.id.movie_details_panel);
         mDividerOne = findViewById(R.id.movie_details_divider_1);
         mDividerTwo = findViewById(R.id.movie_details_divider_2);
-        mFavoriteButton = (Button) findViewById(R.id.movie_details_favorite_button);
+        mFavoriteButton = (LinearLayout) findViewById(R.id.movie_details_favorite_button);
+        mMovieDetailsRating = (TextView) findViewById(R.id.movie_details_rating);
+        mFavoriteButtonImage = (ImageView) findViewById(R.id.movie_details_favorite_button_image);
+        mFavoriteButtonText = (TextView) findViewById(R.id.movie_details_favorite_button_text);
 
         final Movie movie = getIntent().getExtras().getParcelable("Movie");
         new DirectorTask(this, new DirectorTaskCompletedListener()).execute(movie.getId());
@@ -83,12 +104,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
             @Override
             public void onSuccess() {
                 Bitmap bitmap = ((BitmapDrawable) mMovieDetailsPoster.getDrawable()).getBitmap();
-                Palette palette  = Palette.from(bitmap).generate();
+                Palette palette = Palette.from(bitmap).generate();
                 Palette.Swatch vibrantSwatch = palette.getVibrantSwatch();
                 if (vibrantSwatch != null) {
                     applyPaletteColorToViews(vibrantSwatch);
-
-
                 } else {
                     Palette.Swatch mutedSwatch = palette.getMutedSwatch();
                     applyPaletteColorToViews(mutedSwatch);
@@ -101,9 +120,14 @@ public class MovieDetailsActivity extends AppCompatActivity {
             }
         });
 
+
+        Typeface nunitoBold = Typeface.createFromAsset(getAssets(),
+                "fonts/Nunito-Bold.ttf");
+        mCollapsingToolbarLayout.setCollapsedTitleTypeface(nunitoBold);
         mMovieDetailsTitle.setText(movie.getTitle());
         mMovieDetailsReleaseDate.setText(movie.getReleaseDate().substring(0, 4));
         mMovieDetailsSynopsis.setText(movie.getSynopsis());
+        mMovieDetailsRating.setText(movie.getRating());
 
         hideTitleWhenExpanded(movie);
     }
@@ -115,10 +139,21 @@ public class MovieDetailsActivity extends AppCompatActivity {
         mMovieDetailsReleaseDate.setTextColor(swatch.getBodyTextColor());
         mDividerOne.setBackgroundColor(swatch.getRgb());
         mDividerTwo.setBackgroundColor(swatch.getRgb());
-        mFavoriteButton.setTextColor(swatch.getRgb());
-        mFavoriteButton.setCompoundDrawableTintList(ColorStateList.valueOf(swatch.getRgb()));
+        mFavoriteButtonText.setTextColor(swatch.getRgb());
+        mFavoriteButtonImage.setImageTintList(ColorStateList.valueOf(swatch.getRgb()));
         mCollapsingToolbarLayout.setContentScrimColor(swatch.getRgb());
+        mMovieDetailsRating.setTextColor(swatch.getRgb());
+        setStatusBarColor(swatch);
         setButtonBorderColor(swatch);
+    }
+
+    private void setStatusBarColor(Palette.Swatch swatch) {
+        Window window = getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        float[] hsl = swatch.getHsl();
+        hsl[2] = (float) (hsl[2] * 0.9);
+        window.setStatusBarColor(Color.HSVToColor(hsl));
     }
 
     private void setButtonBorderColor(Palette.Swatch swatch) {

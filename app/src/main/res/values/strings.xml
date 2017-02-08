@@ -7,5 +7,5 @@
     <string name="release_date">RELEASE DATE</string>
     <string name="directed_by">Directed by</string>
     <string name="watch_trailer">WATCH TRAILER</string>
-    <string name="favorite">" FAVORITE"</string>
+    <string name="favorite">FAVORITE</string>
 </resources>

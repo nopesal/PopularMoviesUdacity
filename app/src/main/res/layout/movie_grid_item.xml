@@ -1,29 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:weightSum="1">
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="vertical"
+             android:weightSum="1">
 
     <ImageView
         android:id="@+id/movie_grid_item_poster"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:adjustViewBounds="true" />
+        android:adjustViewBounds="true"/>
 
     <LinearLayout
+        android:id="@+id/movie_grid_item_details"
         android:layout_width="match_parent"
         android:layout_height="68dp"
         android:layout_gravity="bottom"
+        android:background="@color/defaultColorForMovies"
         android:orientation="vertical"
-        android:padding="@dimen/two_line_grid_padding"
-        android:id="@+id/movie_grid_item_details"
-        android:background="@color/defaultColorForMovies">
+        android:padding="@dimen/two_line_grid_padding">
 
         <TextView
             android:id="@+id/movie_grid_item_title"
+            fontPath="fonts/Nunito-Bold.ttf"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -31,6 +32,7 @@
             android:textColor="@color/white"
             android:textSize="@dimen/two_line_grid_first_line_text_size"
             android:textStyle="bold"
+            tools:ignore="MissingPrefix"
             tools:text="Finding Dory"/>
 
         <TextView

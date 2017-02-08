@@ -37,6 +37,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
+                app:contentInsetStartWithNavigation="0dp"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>
@@ -59,12 +60,12 @@
                 android:layout_height="wrap_content"
                 android:background="@color/defaultColorForMovies"
                 android:orientation="vertical"
-                android:paddingEnd="16dp"
-                android:paddingStart="16dp">
+                android:paddingEnd="@dimen/horizontal_padding"
+                android:paddingStart="@dimen/horizontal_padding">
 
                 <TextView
                     android:id="@+id/movie_details_title"
-                    fontPath="fonts/Montserrat-Bold.ttf"
+                    fontPath="fonts/Nunito-ExtraBold.ttf"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
@@ -78,16 +79,16 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/movie_details_directed_by_text_view"
-                        fontPath="fonts/Montserrat-Bold.ttf"
+                        fontPath="fonts/Nunito-Bold.ttf"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="4dp"
-                        android:alpha="0.4"
+                        android:alpha="0.5"
                         android:text="@string/directed_by"
                         android:textColor="#212121"
                         android:textStyle="bold"
@@ -97,7 +98,7 @@
 
                     <TextView
                         android:id="@+id/movie_details_director"
-                        fontPath="fonts/Montserrat-Bold.ttf"
+                        fontPath="fonts/Nunito-ExtraBold.ttf"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="#212121"
@@ -109,7 +110,7 @@
 
                     <TextView
                         android:id="@+id/movie_details_release_date"
-                        fontPath="fonts/Montserrat-Bold.ttf"
+                        fontPath="fonts/Nunito-ExtraBold.ttf"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="end"
@@ -123,13 +124,15 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="20dp"
                 android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/movie_details_watch_trailer_button"
+                    fontPath="fonts/Nunito-Bold.ttf"
                     android:layout_width="wrap_content"
                     android:layout_height="35dp"
                     android:background="@drawable/watch_trailer_button_border"
@@ -138,30 +141,48 @@
                     android:paddingStart="8dp"
                     android:text="@string/watch_trailer"
                     android:textColor="@color/watchTrailerButtonColor"
-                    />
+                    tools:ignore="MissingPrefix"/>
 
                 <View
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_weight="1"/>
 
-                <Button
+                <LinearLayout
                     android:id="@+id/movie_details_favorite_button"
                     android:layout_width="wrap_content"
                     android:layout_height="35dp"
                     android:background="@drawable/favorite_button_border"
-                    android:drawableStart="@drawable/ic_favorite_24dp"
+                    android:orientation="horizontal"
                     android:paddingEnd="16dp"
-                    android:paddingStart="12dp"
-                    android:text="@string/favorite"
-                    android:textColor="@color/defaultColorForMovies"/>
+                    android:paddingStart="14dp"
+                    android:text="@string/favorite">
+
+                    <ImageView
+                        android:id="@+id/movie_details_favorite_button_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="4dp"
+                        android:src="@drawable/ic_favorite_24dp"/>
+
+                    <TextView
+                        android:id="@+id/movie_details_favorite_button_text"
+                        fontPath="fonts/Nunito-Bold.ttf"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:text="@string/favorite"
+                        tools:ignore="MissingPrefix"
+                        tools:textColor="@color/defaultColorForMovies"/>
+
+                </LinearLayout>
             </LinearLayout>
 
             <View
                 android:id="@+id/movie_details_divider_1"
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginTop="16dp"
+                android:layout_height="1dp"
                 android:background="@color/defaultColorForMovies"/>
 
             <TextView
@@ -169,16 +190,88 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:padding="16dp"
+                android:paddingBottom="20dp"
+                android:paddingEnd="16dp"
+                android:paddingStart="16dp"
+                android:paddingTop="20dp"
                 android:textAlignment="center"
                 android:textColor="#FFFFFF"
-                tools:text="Buscando a Dory (en inglés, Finding Dory) es una película estadounidense en animación 3D por ordenador. Es la secuela de Buscando a Nemo y también está distribuida por Walt Disney Pictures, producida por Pixar y dirigida por Andrew Stanton, que dirigió la película original, y regresó como escritor y director, junto a Angus MacLane como el codirector."/>
+                tools:text="Buscando a Dory (en inglés, Finding Dory) es una película estadounidense en animación 3D por ordenador. Es la secuela de Buscando a Nemo y también está distribuida por Walt Disney Pictures, producida por Pixar y dirigida por Andrew Stanton, que dirigió la película original, y regresó como escritor y director, junto a Angus MacLane como el codirector."
+                tools:visibility="gone"/>
 
             <View
                 android:id="@+id/movie_details_divider_2"
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
+                android:layout_height="1dp"
                 android:background="@color/defaultColorForMovies"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal"
+                android:paddingEnd="@dimen/horizontal_padding"
+                android:paddingStart="@dimen/horizontal_padding">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        fontPath="fonts/Nunito-Bold.ttf"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="REVIEWS"
+                        android:textSize="12sp"
+                        tools:ignore="MissingPrefix"/>
+
+                    <TextView
+                        fontPath="fonts/Nunito-ExtraBold.ttf"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/text_view_rounded_corners"
+                        android:padding="12dp"
+                        android:text="0 Reviews"
+                        android:textColor="#FFFFFF"
+                        tools:ignore="MissingPrefix"/>
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_weight="2"
+                    android:orientation="vertical">
+
+                    <TextView
+                        fontPath="fonts/Nunito-Bold.ttf"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="TMDB RATING"
+                        android:textSize="12sp"
+                        tools:ignore="MissingPrefix"/>
+
+                    <TextView
+                        android:id="@+id/movie_details_rating"
+                        fontPath="fonts/Nunito-ExtraBold.ttf"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/text_view_rounded_corners"
+                        android:paddingBottom="12dp"
+                        android:paddingTop="12dp"
+                        android:text="8.1"
+                        android:textAlignment="center"
+                        android:textColor="@color/defaultColorForMovies"
+                        tools:ignore="MissingPrefix"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
