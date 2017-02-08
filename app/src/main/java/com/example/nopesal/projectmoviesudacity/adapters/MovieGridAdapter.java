@@ -1,7 +1,9 @@
 package com.example.nopesal.projectmoviesudacity.adapters;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import android.graphics.Typeface;
+import android.support.v7.graphics.Palette;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.nopesal.projectmoviesudacity.MainActivity;
 import com.example.nopesal.projectmoviesudacity.R;
 import com.example.nopesal.projectmoviesudacity.database.MovieDatabase;
 import com.example.nopesal.projectmoviesudacity.utils.Movie;
@@ -22,7 +25,7 @@ import java.util.ArrayList;
  * Created by Nico on 26/01/2017.
  */
 
-public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.ViewHolder> {
+public class MovieGridAdapter extends BaseAdapter {
     private Context mContext;
     private ArrayList<Movie> mMovieArray;
 
@@ -32,22 +35,13 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.View
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.movie_grid_item, null);
-        return new ViewHolder(view);
+    public int getCount() {
+        return mMovieArray.size();
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.mMovieGridItemTitle.setText(mMovieArray.get(position).getTitle());
-        holder.mMovieGridItemYear.setText(mMovieArray.get(position).getReleaseDate().substring(0, 4));
-
-        String posterPath = MovieDatabase.getSDPosterURL(mMovieArray.get(position).getPosterPath());
-        Picasso.with(mContext).load(posterPath).into(holder.mMovieGridItemPoster,
-                PicassoPalette.with(posterPath, holder.mMovieGridItemPoster)
-                        .use(PicassoPalette.Profile.VIBRANT)
-                        .intoBackground(holder.mMovieGridItemDetails)
-        );
+    public Object getItem(int i) {
+        return mMovieArray.get(i);
     }
 
     @Override
@@ -56,22 +50,56 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.View
     }
 
     @Override
-    public int getItemCount() {
-        return mMovieArray.size();
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        final ViewHolder viewHolder;
+
+        if (convertView == null) {
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.movie_grid_item, null);
+            viewHolder = new ViewHolder();
+            viewHolder.mMovieGridItemPoster = (ImageView) convertView.findViewById(R.id.movie_grid_item_poster);
+            viewHolder.mMovieGridItemTitle = (TextView) convertView.findViewById(R.id.movie_grid_item_title);
+            viewHolder.mMovieGridItemYear = (TextView) convertView.findViewById(R.id.movie_grid_item_year);
+            viewHolder.mMovieGridItemDetails = (LinearLayout) convertView.findViewById(R.id.movie_grid_item_details);
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
+
+        Typeface nunitoBold = Typeface.createFromAsset(mContext.getAssets(),
+                "fonts/Nunito-Bold.ttf");
+        Typeface nunitoRegular = Typeface.createFromAsset(mContext.getAssets(),
+                "fonts/Nunito-Regular.ttf");
+        viewHolder.mMovieGridItemTitle.setTypeface(nunitoBold);
+        viewHolder.mMovieGridItemYear.setTypeface(nunitoRegular);
+        viewHolder.mMovieGridItemTitle.setText(mMovieArray.get(position).getTitle());
+        viewHolder.mMovieGridItemYear.setText(mMovieArray.get(position).getReleaseDate().substring(0, 4));
+
+        String posterPath = MovieDatabase.getSDPosterURL(mMovieArray.get(position).getPosterPath());
+        Picasso.with(mContext).load(posterPath).placeholder(R.drawable.movie_poster_placeholder).into(viewHolder.mMovieGridItemPoster,
+                PicassoPalette.with(posterPath, viewHolder.mMovieGridItemPoster)
+                        .intoCallBack(new PicassoPalette.CallBack() {
+                            @Override
+                            public void onPaletteLoaded(Palette palette) {
+                                try {
+                                    Palette.Swatch swatch = palette.getVibrantSwatch();
+                                    if (swatch != null) {
+                                        viewHolder.mMovieGridItemDetails.setBackgroundColor(swatch.getRgb());
+                                    } else {
+                                        viewHolder.mMovieGridItemDetails.setBackgroundColor(palette.getMutedSwatch().getRgb());
+                                    }
+                                } catch (NullPointerException ignored) {
+                                }
+                            }
+                        })
+        );
+
+        return convertView;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    private static class ViewHolder {
         ImageView mMovieGridItemPoster;
         TextView mMovieGridItemTitle;
         TextView mMovieGridItemYear;
         LinearLayout mMovieGridItemDetails;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-            mMovieGridItemPoster = (ImageView) itemView.findViewById(R.id.movie_grid_item_poster);
-            mMovieGridItemTitle = (TextView) itemView.findViewById(R.id.movie_grid_item_title);
-            mMovieGridItemYear = (TextView) itemView.findViewById(R.id.movie_grid_item_year);
-            mMovieGridItemDetails = (LinearLayout) itemView.findViewById(R.id.movie_grid_item_details);
-        }
     }
 }

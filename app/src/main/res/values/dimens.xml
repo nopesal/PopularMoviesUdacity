@@ -5,7 +5,11 @@
 
     <dimen name="two_line_grid_padding">16dp</dimen>
 
-    <dimen name="movie_details_title_text_size">28sp</dimen>
     <dimen name="two_line_grid_first_line_text_size">16sp</dimen>
     <dimen name="two_line_grid_second_line_text_size">12sp</dimen>
+
+    <!-- Movie Details screen dimensions -->
+    <dimen name="movie_details_title_text_size">22sp</dimen>
+    <dimen name="horizontal_padding">16dp</dimen>
+    <dimen name="vertical_padding">16dp</dimen>
 </resources>

@@ -1,50 +1,75 @@
 package com.example.nopesal.projectmoviesudacity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.TextView;
 
 import com.example.nopesal.projectmoviesudacity.adapters.MovieGridAdapter;
 import com.example.nopesal.projectmoviesudacity.database.MovieDatabase;
-import com.example.nopesal.projectmoviesudacity.itemdecorations.ItemSpacingDecoration;
 import com.example.nopesal.projectmoviesudacity.utils.Movie;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 public class MainActivity extends AppCompatActivity {
 
-    public RecyclerView mGridRecyclerView;
+    public GridView mGridView;
     public TextView mConnectionErrorMessage;
 
     public ArrayList<Movie> mMovieArrayList;
     public String mOrder = "popular";
+
+    public interface AsyncTaskCompleteListener<T> {
+        public void onTaskCompleted(T result);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mGridRecyclerView = (RecyclerView) findViewById(R.id.movie_grid_recycler_view);
-        mConnectionErrorMessage = (TextView) findViewById(R.id.connection_error_message);
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/Nunito-Regular.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build()
+        );
 
-        mGridRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        mGridRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mGridRecyclerView.addItemDecoration(new ItemSpacingDecoration(12, 2, false));
-        new PopularMoviesTask().execute(mOrder);
-        if (!isNetworkAvailable()){
+        mGridView = (GridView) findViewById(R.id.movie_grid_view);
+        mConnectionErrorMessage = (TextView) findViewById(R.id.connection_error_message);
+        new PopularMoviesTask(this, new PopularMoviesTaskCompletedListener()).execute(mOrder);
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Movie movie = mMovieArrayList.get(i);
+                Log.i("MOVIEID", "onItemClick: " + movie.getId());
+                Intent intent = new Intent(getApplicationContext(), MovieDetailsActivity.class);
+                intent.putExtra("Movie", movie);
+                startActivity(intent);
+            }
+        });
+        if (!isNetworkAvailable()) {
             mConnectionErrorMessage.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     @Override
@@ -63,9 +88,9 @@ public class MainActivity extends AppCompatActivity {
                 item.setTitle("Top Rated");
                 mOrder = "top_rated";
             }
-            new PopularMoviesTask().execute(mOrder);
+            new PopularMoviesTask(this, new PopularMoviesTaskCompletedListener()).execute(mOrder);
         }
-        if (isNetworkAvailable()){
+        if (isNetworkAvailable()) {
             mConnectionErrorMessage.setVisibility(View.GONE);
         } else {
             mConnectionErrorMessage.setVisibility(View.VISIBLE);
@@ -85,23 +110,12 @@ public class MainActivity extends AppCompatActivity {
         return isAvailable;
     }
 
-    public class PopularMoviesTask extends AsyncTask<String, Void, ArrayList<Movie>> {
+    public class PopularMoviesTaskCompletedListener implements AsyncTaskCompleteListener<ArrayList<Movie>> {
         @Override
-        protected ArrayList<Movie> doInBackground(String... order) {
-            MovieDatabase movieDatabase = new MovieDatabase();
-            ArrayList<Movie> movieArrayList = new ArrayList<>();
-            try {
-                movieArrayList = movieDatabase.getMoviesArray(mOrder);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return movieArrayList;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Movie> movies) {
+        public void onTaskCompleted(ArrayList<Movie> movies) {
             mMovieArrayList = movies;
-            mGridRecyclerView.setAdapter(new MovieGridAdapter(getApplicationContext(), movies));
+            final MovieGridAdapter adapter = new MovieGridAdapter(getApplicationContext(), mMovieArrayList);
+            mGridView.setAdapter(adapter);
         }
     }
 }
