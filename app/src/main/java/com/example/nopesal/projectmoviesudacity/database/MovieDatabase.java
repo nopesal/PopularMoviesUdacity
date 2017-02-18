@@ -52,7 +52,7 @@ public class MovieDatabase {
         return moviesArray;
     }
 
-    public static String getSDPosterURL(String posterPath){
+    public static String getSDPosterURL(String posterPath) {
         Uri.Builder builder = new Uri.Builder();
         builder.scheme("https")
                 .authority(POSTER_BASE_URL)
@@ -62,7 +62,7 @@ public class MovieDatabase {
         return builder.build().toString() + posterPath;
     }
 
-    public static String getHDPosterURL(String posterPath){
+    public static String getHDPosterURL(String posterPath) {
         Uri.Builder builder = new Uri.Builder();
         builder.scheme("https")
                 .authority(POSTER_BASE_URL)
@@ -105,8 +105,6 @@ public class MovieDatabase {
     public String getDirectorFromMovie(int id) throws IOException {
         String url = generateCreditsURL(String.valueOf(id));
         String apiResponseJSON = getJSONFromApi(url);
-        Log.i("CREDITS", "getDirectorFromMovie: "+ url);
-
         try {
             JSONArray crewArray = new JSONObject(apiResponseJSON).getJSONArray("crew");
             for (int i = 0; i < crewArray.length(); i++) {
@@ -115,6 +113,39 @@ public class MovieDatabase {
                     return crew.getString("name");
                 }
             }
+        } catch (JSONException ignored) {
+        }
+        return null;
+    }
+
+    private String generateTrailerURL(String id) {
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme("https")
+                .authority(BASE_URL)
+                .appendPath(API_VERSION)
+                .appendPath(TYPE_MOVIE)
+                .appendPath(id)
+                .appendPath("videos")
+                .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_TOKEN);
+        return builder.build().toString();
+    }
+
+    private String generateYoutubeURL(String youtubeKey) {
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme("https")
+                .authority("www.youtube.com")
+                .appendPath("watch")
+                .appendQueryParameter("v", youtubeKey);
+        return builder.build().toString();
+    }
+
+    public String getYoutubeTrailerURL(int id) throws IOException {
+        String url = generateTrailerURL(String.valueOf(id));
+        String apiResponseJSON = getJSONFromApi(url);
+        try {
+            JSONArray trailersArray = new JSONObject(apiResponseJSON).getJSONArray("results");
+            JSONObject firstTrailer = (JSONObject) trailersArray.get(0);
+            return generateYoutubeURL(firstTrailer.getString("key"));
         } catch (JSONException ignored) {
         }
         return null;

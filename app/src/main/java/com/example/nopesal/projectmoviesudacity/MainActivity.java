@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
         mGridView = (GridView) findViewById(R.id.movie_grid_view);
         mConnectionErrorMessage = (TextView) findViewById(R.id.connection_error_message);
-        new PopularMoviesTask(this, new PopularMoviesTaskCompletedListener()).execute(mOrder);
+        new PopularMoviesTask(new PopularMoviesTaskCompletedListener()).execute(mOrder);
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
                 item.setTitle("Top Rated");
                 mOrder = "top_rated";
             }
-            new PopularMoviesTask(this, new PopularMoviesTaskCompletedListener()).execute(mOrder);
+            new PopularMoviesTask(new PopularMoviesTaskCompletedListener()).execute(mOrder);
         }
         if (isNetworkAvailable()) {
             mConnectionErrorMessage.setVisibility(View.GONE);

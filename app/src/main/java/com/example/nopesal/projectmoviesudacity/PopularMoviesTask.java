@@ -14,11 +14,10 @@ import java.util.ArrayList;
  */
 
 public class PopularMoviesTask extends AsyncTask<String, Void, ArrayList<Movie>> {
-    private Context mContext;
+
     private MainActivity.AsyncTaskCompleteListener<ArrayList<Movie>> listener;
 
-    public PopularMoviesTask(Context mContext, MainActivity.AsyncTaskCompleteListener<ArrayList<Movie>> listener) {
-        this.mContext = mContext;
+    public PopularMoviesTask(MainActivity.AsyncTaskCompleteListener<ArrayList<Movie>> listener) {
         this.listener = listener;
     }
 
