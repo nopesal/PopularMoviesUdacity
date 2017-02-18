@@ -6,4 +6,5 @@
     <color name="white">#FFFFFF</color>
     <color name="defaultColorForMovies">#FACD2A</color>
     <color name="watchTrailerButtonColor">#AD463A</color>
+    <color name="detailsGrey">#FF212121</color>
 </resources>
