@@ -11,6 +11,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -41,6 +42,7 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -63,6 +65,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     @BindView(R.id.app_bar) AppBarLayout mAppBarLayout;
     @BindView(R.id.movie_details_review_recycler_view) RecyclerView mReviewRecyclerView;
     @BindView(R.id.movie_details_reviews_number) TextView mReviewsNumber;
+    @BindView(R.id.activity_movie_details) CoordinatorLayout mCoordinatorLayout;
 
     public interface AsyncTaskCompleteListener<T> {
         public void onTaskCompleted(T result);
@@ -109,11 +112,12 @@ public class MovieDetailsActivity extends AppCompatActivity {
                     Palette.Swatch mutedSwatch = palette.getMutedSwatch();
                     applyPaletteColorToViews(mutedSwatch);
                 }
+                mCoordinatorLayout.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onError() {
-                //Do nothing
+                mCoordinatorLayout.setVisibility(View.VISIBLE);
             }
         });
 
@@ -136,12 +140,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
         mMovieDetailsReleaseDate.setTextColor(swatch.getBodyTextColor());
         mDividerOne.setBackgroundColor(swatch.getRgb());
         mDividerTwo.setBackgroundColor(swatch.getRgb());
-        mFavoriteButtonText.setTextColor(swatch.getRgb());
-        mFavoriteButtonImage.setImageTintList(ColorStateList.valueOf(swatch.getRgb()));
         mCollapsingToolbarLayout.setContentScrimColor(swatch.getRgb());
         mMovieDetailsRating.setTextColor(swatch.getRgb());
         setStatusBarColor(swatch);
-        setFavoriteButtonBorderColor(swatch);
+        setFavoriteButtonColor(swatch);
     }
 
     private void setStatusBarColor(Palette.Swatch swatch) {
@@ -153,11 +155,16 @@ public class MovieDetailsActivity extends AppCompatActivity {
         window.setStatusBarColor(Color.HSVToColor(hsl));
     }
 
-    private void setFavoriteButtonBorderColor(Palette.Swatch swatch) {
+    private void setFavoriteButtonColor(Palette.Swatch swatch) {
+        mFavoriteButtonText.setTextColor(swatch.getRgb());
+        mFavoriteButtonImage.setImageTintList(ColorStateList.valueOf(swatch.getRgb()));
+
         GradientDrawable gd = new GradientDrawable();
         gd.setCornerRadius(7 * getResources().getDisplayMetrics().density);
         gd.setStroke((int) (1 * getResources().getDisplayMetrics().density), swatch.getRgb());
         mFavoriteButton.setBackground(gd);
+
+        mFavoriteButton.setTag(R.bool.swatch_color_assigned, swatch);
     }
 
     private void showDirectorInPanel() {
@@ -173,6 +180,25 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    @OnClick(R.id.movie_details_favorite_button)
+    public void onFavoriteButtonClicked(View view) {
+        Palette.Swatch swatch = (Palette.Swatch) mFavoriteButton.getTag(R.bool.swatch_color_assigned);
+        if (mFavoriteButton.getTag(R.bool.favorite_button_pressed) != null && mFavoriteButton.getTag(R.bool.favorite_button_pressed).equals(true)) {
+            mFavoriteButton.setTag(R.bool.favorite_button_pressed, false);
+            mFavoriteButtonImage.setImageResource(R.drawable.favorite_button_not_pressed_icon);
+            setFavoriteButtonColor(swatch);
+        } else {
+            GradientDrawable gd = new GradientDrawable();
+            gd.setCornerRadius(7 * getResources().getDisplayMetrics().density);
+            gd.setColor(swatch.getRgb());
+            mFavoriteButton.setBackground(gd);
+            mFavoriteButtonText.setTextColor(getColor(R.color.detailsGrey));
+            mFavoriteButtonImage.setImageResource(R.drawable.favorite_button_pressed_icon);
+            mFavoriteButtonImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.detailsGrey)));
+            mFavoriteButton.setTag(R.bool.favorite_button_pressed, true);
+        }
     }
 
     /**

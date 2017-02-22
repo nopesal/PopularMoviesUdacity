@@ -44,6 +44,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:textSize="16sp"
         android:textColor="@color/white"
         tools:text="Summertime 2016 has not been very kind to DC Comics-based personalities looking to shine consistently like their big screen Marvel Comics counterparts."/>
 </RelativeLayout>

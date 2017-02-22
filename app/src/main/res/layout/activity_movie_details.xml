@@ -5,6 +5,8 @@
                                                  xmlns:tools="http://schemas.android.com/tools"
                                                  android:layout_width="match_parent"
                                                  android:layout_height="match_parent"
+                                                 android:visibility="invisible"
+                                                 tools:visibility="visible"
                                                  tools:context="com.example.nopesal.projectmoviesudacity.MovieDetailsActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -61,8 +63,7 @@
                 android:background="@color/defaultColorForMovies"
                 android:orientation="vertical"
                 android:paddingEnd="@dimen/horizontal_padding"
-                android:paddingStart="@dimen/horizontal_padding"
-                tools:visibility="gone">
+                android:paddingStart="@dimen/horizontal_padding">
 
                 <TextView
                     android:id="@+id/movie_details_title"
@@ -129,8 +130,7 @@
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
                 android:layout_marginTop="20dp"
-                android:orientation="horizontal"
-                tools:visibility="gone">
+                android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/movie_details_watch_trailer_button"
@@ -154,7 +154,7 @@
                     android:id="@+id/movie_details_favorite_button"
                     android:layout_width="wrap_content"
                     android:layout_height="35dp"
-                    android:background="@drawable/favorite_button_border"
+                    android:background="@drawable/favorite_button_background"
                     android:orientation="horizontal"
                     android:paddingEnd="16dp"
                     android:paddingStart="14dp"
@@ -166,7 +166,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center_vertical"
                         android:layout_marginEnd="4dp"
-                        android:src="@drawable/ic_favorite_24dp"/>
+                        android:src="@drawable/favorite_button_not_pressed_icon"/>
 
                     <TextView
                         android:id="@+id/movie_details_favorite_button_text"
@@ -210,8 +210,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginTop="20dp"
                 android:orientation="horizontal"
                 android:paddingEnd="@dimen/horizontal_padding"
                 android:paddingStart="@dimen/horizontal_padding">
@@ -232,9 +232,9 @@
                         tools:ignore="MissingPrefix"/>
 
                     <TextView
+                        android:id="@+id/movie_details_reviews_number"
                         fontPath="fonts/Nunito-ExtraBold.ttf"
                         android:layout_width="match_parent"
-                        android:id="@+id/movie_details_reviews_number"
                         android:layout_height="wrap_content"
                         android:background="@drawable/text_view_rounded_corners"
                         android:padding="12dp"
@@ -276,12 +276,14 @@
                 </LinearLayout>
 
             </LinearLayout>
+
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/movie_details_review_recycler_view"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:layout_height="wrap_content"/>
+                tools:visibility="gone"/>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>

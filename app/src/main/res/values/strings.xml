@@ -10,7 +10,7 @@
     <string name="favorite">FAVORITE</string>
     <string name="reviews">REVIEWS</string>
     <string name="tmdb_rating">TMDB RATING</string>
-    <string name="loading_reviews">Loading reviews...</string>
+    <string name="loading_reviews">Loading reviews…</string>
     <plurals name="number_of_reviews">
         <item quantity="one">%d review</item>
         <item quantity="other">%d reviews</item>

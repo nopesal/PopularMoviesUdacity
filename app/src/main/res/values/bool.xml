@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="favorite_button_pressed">false</bool>
+    <bool name="swatch_color_assigned">true</bool>
+</resources>
