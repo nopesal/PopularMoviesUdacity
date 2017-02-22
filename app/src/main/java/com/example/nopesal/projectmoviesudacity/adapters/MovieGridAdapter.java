@@ -3,7 +3,6 @@ package com.example.nopesal.projectmoviesudacity.adapters;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v7.graphics.Palette;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +11,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.nopesal.projectmoviesudacity.MainActivity;
 import com.example.nopesal.projectmoviesudacity.R;
-import com.example.nopesal.projectmoviesudacity.database.MovieDatabase;
+import com.example.nopesal.projectmoviesudacity.database.URLGenerator;
 import com.example.nopesal.projectmoviesudacity.utils.Movie;
 import com.github.florent37.picassopalette.PicassoPalette;
 import com.squareup.picasso.Picasso;
@@ -74,7 +72,7 @@ public class MovieGridAdapter extends BaseAdapter {
         viewHolder.mMovieGridItemTitle.setText(mMovieArray.get(position).getTitle());
         viewHolder.mMovieGridItemYear.setText(mMovieArray.get(position).getReleaseDate().substring(0, 4));
 
-        String posterPath = MovieDatabase.getSDPosterURL(mMovieArray.get(position).getPosterPath());
+        String posterPath = URLGenerator.getSDPosterURL(mMovieArray.get(position).getPosterPath());
         Picasso.with(mContext).load(posterPath).placeholder(R.drawable.movie_poster_placeholder).into(viewHolder.mMovieGridItemPoster,
                 PicassoPalette.with(posterPath, viewHolder.mMovieGridItemPoster)
                         .intoCallBack(new PicassoPalette.CallBack() {

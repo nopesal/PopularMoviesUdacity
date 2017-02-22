@@ -11,9 +11,12 @@ import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Window;
@@ -23,10 +26,18 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.nopesal.projectmoviesudacity.database.MovieDatabase;
+import com.dgreenhalgh.android.simpleitemdecoration.linear.DividerItemDecoration;
+import com.example.nopesal.projectmoviesudacity.adapters.ReviewListAdapter;
+import com.example.nopesal.projectmoviesudacity.database.URLGenerator;
+import com.example.nopesal.projectmoviesudacity.tasks.DirectorTask;
+import com.example.nopesal.projectmoviesudacity.tasks.ReviewsTask;
+import com.example.nopesal.projectmoviesudacity.tasks.TrailerTask;
 import com.example.nopesal.projectmoviesudacity.utils.Movie;
+import com.example.nopesal.projectmoviesudacity.utils.Review;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,6 +61,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
     @BindView(R.id.movie_details_favorite_button_text) TextView mFavoriteButtonText;
     @BindView(R.id.movie_details_directed_by_text_view) TextView mDirectedByTextView;
     @BindView(R.id.app_bar) AppBarLayout mAppBarLayout;
+    @BindView(R.id.movie_details_review_recycler_view) RecyclerView mReviewRecyclerView;
+    @BindView(R.id.movie_details_reviews_number) TextView mReviewsNumber;
 
     public interface AsyncTaskCompleteListener<T> {
         public void onTaskCompleted(T result);
@@ -81,8 +94,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
         final Movie movie = getIntent().getExtras().getParcelable("Movie");
         new DirectorTask(new DirectorTaskCompletedListener()).execute(movie.getId());
         new TrailerTask(new TrailerTaskCompletedListener()).execute(movie.getId());
+        new ReviewsTask(new ReviewsTaskCompletedListener()).execute(movie.getId());
 
-        String posterPath = MovieDatabase.getHDPosterURL(movie.getPosterPath());
+        String posterPath = URLGenerator.getHDPosterURL(movie.getPosterPath());
         Picasso.with(getApplicationContext()).load(posterPath).into(mMovieDetailsPoster, new Callback() {
             @Override
             public void onSuccess() {
@@ -209,6 +223,19 @@ public class MovieDetailsActivity extends AppCompatActivity {
             if (youtubeTrailerURL != null) {
                 assignTargetToMovieTrailerButton(youtubeTrailerURL);
             }
+        }
+    }
+
+    public class ReviewsTaskCompletedListener implements MovieDetailsActivity.AsyncTaskCompleteListener<ArrayList<Review>> {
+        @Override
+        public void onTaskCompleted(ArrayList<Review> reviewArrayList) {
+            if (!reviewArrayList.isEmpty()) {
+                mReviewRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                mReviewRecyclerView.addItemDecoration(new DividerItemDecoration(ContextCompat.getDrawable(getApplicationContext(), R.drawable.transparent_divider)));
+                mReviewRecyclerView.setAdapter(new ReviewListAdapter(getApplicationContext(), reviewArrayList));
+                mReviewRecyclerView.setNestedScrollingEnabled(false);
+            }
+            mReviewsNumber.setText(getApplicationContext().getResources().getQuantityString(R.plurals.number_of_reviews, reviewArrayList.size(), reviewArrayList.size()));
         }
     }
 }

@@ -36,8 +36,8 @@
                 android:id="@+id/movie_details_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin"
                 app:contentInsetStartWithNavigation="0dp"
+                app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>
@@ -61,7 +61,8 @@
                 android:background="@color/defaultColorForMovies"
                 android:orientation="vertical"
                 android:paddingEnd="@dimen/horizontal_padding"
-                android:paddingStart="@dimen/horizontal_padding">
+                android:paddingStart="@dimen/horizontal_padding"
+                tools:visibility="gone">
 
                 <TextView
                     android:id="@+id/movie_details_title"
@@ -128,7 +129,8 @@
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
                 android:layout_marginTop="20dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                tools:visibility="gone">
 
                 <Button
                     android:id="@+id/movie_details_watch_trailer_button"
@@ -209,6 +211,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:orientation="horizontal"
                 android:paddingEnd="@dimen/horizontal_padding"
                 android:paddingStart="@dimen/horizontal_padding">
@@ -224,17 +227,18 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="REVIEWS"
+                        android:text="@string/reviews"
                         android:textSize="12sp"
                         tools:ignore="MissingPrefix"/>
 
                     <TextView
                         fontPath="fonts/Nunito-ExtraBold.ttf"
                         android:layout_width="match_parent"
+                        android:id="@+id/movie_details_reviews_number"
                         android:layout_height="wrap_content"
                         android:background="@drawable/text_view_rounded_corners"
                         android:padding="12dp"
-                        android:text="0 Reviews"
+                        android:text="@string/loading_reviews"
                         android:textColor="#FFFFFF"
                         tools:ignore="MissingPrefix"/>
                 </LinearLayout>
@@ -252,7 +256,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="TMDB RATING"
+                        android:text="@string/tmdb_rating"
                         android:textSize="12sp"
                         tools:ignore="MissingPrefix"/>
 
@@ -264,15 +268,20 @@
                         android:background="@drawable/text_view_rounded_corners"
                         android:paddingBottom="12dp"
                         android:paddingTop="12dp"
-                        android:text="8.1"
                         android:textAlignment="center"
                         android:textColor="@color/defaultColorForMovies"
-                        tools:ignore="MissingPrefix"/>
+                        tools:ignore="MissingPrefix"
+                        tools:text="8.1"/>
 
                 </LinearLayout>
 
             </LinearLayout>
-
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/movie_details_review_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_height="wrap_content"/>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>

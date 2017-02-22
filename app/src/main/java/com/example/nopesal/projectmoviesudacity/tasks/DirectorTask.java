@@ -1,8 +1,9 @@
-package com.example.nopesal.projectmoviesudacity;
+package com.example.nopesal.projectmoviesudacity.tasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.example.nopesal.projectmoviesudacity.MovieDetailsActivity;
 import com.example.nopesal.projectmoviesudacity.database.MovieDatabase;
 
 import java.io.IOException;

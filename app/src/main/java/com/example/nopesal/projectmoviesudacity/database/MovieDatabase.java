@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.example.nopesal.projectmoviesudacity.BuildConfig;
 import com.example.nopesal.projectmoviesudacity.utils.Movie;
+import com.example.nopesal.projectmoviesudacity.utils.Review;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,18 +23,12 @@ import okhttp3.Response;
  */
 
 public class MovieDatabase {
-    private static String BASE_URL = "api.themoviedb.org";
-    private static String API_VERSION = "3";
-    private static String TYPE_MOVIE = "movie";
-    private static String POSTER_BASE_URL = "image.tmdb.org";
-
     public ArrayList<Movie> getMoviesArray(String order) throws IOException {
-        String url = generateMoviesURL(order);
+        String url = URLGenerator.generateMoviesURL(order);
         String apiResponseJSON = getJSONFromApi(url);
-        JSONArray moviesJSON = null;
         ArrayList<Movie> moviesArray = new ArrayList<>();
         try {
-            moviesJSON = new JSONObject(apiResponseJSON).getJSONArray("results");
+            JSONArray moviesJSON = new JSONObject(apiResponseJSON).getJSONArray("results");
             for (int i = 0; i < moviesJSON.length(); i++) {
                 JSONObject movieJSON = (JSONObject) moviesJSON.get(i);
                 Movie movie = new Movie(
@@ -52,26 +47,6 @@ public class MovieDatabase {
         return moviesArray;
     }
 
-    public static String getSDPosterURL(String posterPath) {
-        Uri.Builder builder = new Uri.Builder();
-        builder.scheme("https")
-                .authority(POSTER_BASE_URL)
-                .appendPath("t")
-                .appendPath("p")
-                .appendPath("w342");
-        return builder.build().toString() + posterPath;
-    }
-
-    public static String getHDPosterURL(String posterPath) {
-        Uri.Builder builder = new Uri.Builder();
-        builder.scheme("https")
-                .authority(POSTER_BASE_URL)
-                .appendPath("t")
-                .appendPath("p")
-                .appendPath("w500");
-        return builder.build().toString() + posterPath;
-    }
-
     private String getJSONFromApi(String url) throws IOException {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(url).build();
@@ -79,31 +54,8 @@ public class MovieDatabase {
         return response.body().string();
     }
 
-    private String generateMoviesURL(String order) {
-        Uri.Builder builder = new Uri.Builder();
-        builder.scheme("https")
-                .authority(BASE_URL)
-                .appendPath(API_VERSION)
-                .appendPath(TYPE_MOVIE)
-                .appendPath(order)
-                .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_TOKEN);
-        return builder.build().toString();
-    }
-
-    private String generateCreditsURL(String id) {
-        Uri.Builder builder = new Uri.Builder();
-        builder.scheme("https")
-                .authority(BASE_URL)
-                .appendPath(API_VERSION)
-                .appendPath(TYPE_MOVIE)
-                .appendPath(id)
-                .appendPath("credits")
-                .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_TOKEN);
-        return builder.build().toString();
-    }
-
     public String getDirectorFromMovie(int id) throws IOException {
-        String url = generateCreditsURL(String.valueOf(id));
+        String url = URLGenerator.generateCreditsURL(String.valueOf(id));
         String apiResponseJSON = getJSONFromApi(url);
         try {
             JSONArray crewArray = new JSONObject(apiResponseJSON).getJSONArray("crew");
@@ -118,36 +70,37 @@ public class MovieDatabase {
         return null;
     }
 
-    private String generateTrailerURL(String id) {
-        Uri.Builder builder = new Uri.Builder();
-        builder.scheme("https")
-                .authority(BASE_URL)
-                .appendPath(API_VERSION)
-                .appendPath(TYPE_MOVIE)
-                .appendPath(id)
-                .appendPath("videos")
-                .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_TOKEN);
-        return builder.build().toString();
-    }
-
-    private String generateYoutubeURL(String youtubeKey) {
-        Uri.Builder builder = new Uri.Builder();
-        builder.scheme("https")
-                .authority("www.youtube.com")
-                .appendPath("watch")
-                .appendQueryParameter("v", youtubeKey);
-        return builder.build().toString();
-    }
-
     public String getYoutubeTrailerURL(int id) throws IOException {
-        String url = generateTrailerURL(String.valueOf(id));
+        String url = URLGenerator.generateTrailerURL(String.valueOf(id));
         String apiResponseJSON = getJSONFromApi(url);
         try {
             JSONArray trailersArray = new JSONObject(apiResponseJSON).getJSONArray("results");
             JSONObject firstTrailer = (JSONObject) trailersArray.get(0);
-            return generateYoutubeURL(firstTrailer.getString("key"));
+            return URLGenerator.generateYoutubeURL(firstTrailer.getString("key"));
         } catch (JSONException ignored) {
         }
         return null;
+    }
+
+    public ArrayList<Review> getMovieReviews(int id) throws IOException {
+        String url = URLGenerator.generateReviewsURL(String.valueOf(id));
+        Log.i("REVIEWS", "getMovieReviews: " + url);
+        String apiResponseJSON = getJSONFromApi(url);
+        ArrayList<Review> reviewsArray = new ArrayList<>();
+        try {
+            JSONArray reviewsJSON = new JSONObject(apiResponseJSON).getJSONArray("results");
+            for (int i = 0; i < reviewsJSON.length(); i++) {
+                JSONObject movieJSON = (JSONObject) reviewsJSON.get(i);
+                Review review = new Review(
+                        movieJSON.getString("content"),
+                        movieJSON.getString("author")
+                );
+                reviewsArray.add(review);
+            }
+        } catch (JSONException e) {
+            Log.e("REVIEWS", "getMovieReviews: Error parsing reviews JSON");
+            e.printStackTrace();
+        }
+        return reviewsArray;
     }
 }

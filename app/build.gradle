@@ -37,6 +37,7 @@ dependencies {
     compile 'uk.co.chrisjenx:calligraphy:2.2.0'
     compile 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+    compile 'com.bignerdranch.android:simple-item-decoration:1.0.0'
 }
 
 repositories {

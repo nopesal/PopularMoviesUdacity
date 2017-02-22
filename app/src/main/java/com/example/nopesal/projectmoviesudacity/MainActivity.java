@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,19 +15,20 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 import com.example.nopesal.projectmoviesudacity.adapters.MovieGridAdapter;
-import com.example.nopesal.projectmoviesudacity.database.MovieDatabase;
+import com.example.nopesal.projectmoviesudacity.tasks.PopularMoviesTask;
 import com.example.nopesal.projectmoviesudacity.utils.Movie;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class MainActivity extends AppCompatActivity {
 
-    public GridView mGridView;
-    public TextView mConnectionErrorMessage;
+    @BindView(R.id.movie_grid_view) GridView mGridView;
+    @BindView(R.id.connection_error_message) TextView mConnectionErrorMessage;
 
     public ArrayList<Movie> mMovieArrayList;
     public String mOrder = "popular";
@@ -42,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                 .setDefaultFontPath("fonts/Nunito-Regular.ttf")
@@ -49,14 +49,11 @@ public class MainActivity extends AppCompatActivity {
                 .build()
         );
 
-        mGridView = (GridView) findViewById(R.id.movie_grid_view);
-        mConnectionErrorMessage = (TextView) findViewById(R.id.connection_error_message);
         new PopularMoviesTask(new PopularMoviesTaskCompletedListener()).execute(mOrder);
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Movie movie = mMovieArrayList.get(i);
-                Log.i("MOVIEID", "onItemClick: " + movie.getId());
                 Intent intent = new Intent(getApplicationContext(), MovieDetailsActivity.class);
                 intent.putExtra("Movie", movie);
                 startActivity(intent);
@@ -113,9 +110,11 @@ public class MainActivity extends AppCompatActivity {
     public class PopularMoviesTaskCompletedListener implements AsyncTaskCompleteListener<ArrayList<Movie>> {
         @Override
         public void onTaskCompleted(ArrayList<Movie> movies) {
-            mMovieArrayList = movies;
-            final MovieGridAdapter adapter = new MovieGridAdapter(getApplicationContext(), mMovieArrayList);
-            mGridView.setAdapter(adapter);
+            if (!movies.isEmpty()) {
+                mMovieArrayList = movies;
+                final MovieGridAdapter adapter = new MovieGridAdapter(getApplicationContext(), mMovieArrayList);
+                mGridView.setAdapter(adapter);
+            }
         }
     }
 }

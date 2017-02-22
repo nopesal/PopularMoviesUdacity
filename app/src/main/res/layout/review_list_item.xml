@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/text_view_rounded_corners"
+                android:orientation="vertical"
+                android:padding="@dimen/horizontal_padding">
+
+    <TextView
+        android:id="@+id/review_item_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/review_item_first_line_text_view"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:textColor="@color/white"
+        tools:text="Following the super-sized dud that was _Batman v. Superman: Dawn of Justice_ released a few months ago must really put some major pressure on Warner Bros. to gamble on ensuring that the presence of **Suicide Squad** does not meet the same kind of indifferent reception. Well, it turns out that although the anticipation was high for writer-director David Ayer's supervillain saga involving high-powered imprisoned ro colorful mishmash of collective misfits laboriously taking up space in a disjointed eye candy-coated spectacle that never manages to match its intended sizzle.One would think that the premise for **Suicide Squad** would tap into the intriguing naughtiness with more robust gumption given the collection of super-powered oddballs asked to be immediate anti-heroes in this toothless jamboree of renegade rejects. Strangely, the grim and brooding presentation of **Suicide Squad** is more of an erratic downer than a hyperactive high-wire act as intended at the creative hands of Ayer."/>
+
+    <TextView
+        android:id="@+id/review_item_author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/review_item_text_view"
+        android:textColor="@color/white"
+        tools:text="Reno"/>
+
+    <TextView
+        android:id="@+id/review_item_author_by_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/review_item_text_view"
+        android:layout_marginEnd="4dp"
+        android:layout_toStartOf="@id/review_item_author"
+        android:alpha="0.7"
+        android:text="by"
+        android:textColor="@color/white"/>
+
+    <TextView
+        android:id="@+id/review_item_first_line_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:textColor="@color/white"
+        tools:text="Summertime 2016 has not been very kind to DC Comics-based personalities looking to shine consistently like their big screen Marvel Comics counterparts."/>
+</RelativeLayout>
