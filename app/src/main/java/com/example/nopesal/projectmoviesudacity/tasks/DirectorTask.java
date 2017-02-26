@@ -1,10 +1,9 @@
 package com.example.nopesal.projectmoviesudacity.tasks;
 
-import android.content.Context;
 import android.os.AsyncTask;
 
 import com.example.nopesal.projectmoviesudacity.MovieDetailsActivity;
-import com.example.nopesal.projectmoviesudacity.database.MovieDatabase;
+import com.example.nopesal.projectmoviesudacity.database.TheMovieDatabase;
 
 import java.io.IOException;
 
@@ -22,10 +21,10 @@ public class DirectorTask extends AsyncTask<Integer, Void, String> {
 
     @Override
     protected String doInBackground(Integer... id) {
-        MovieDatabase movieDatabase = new MovieDatabase();
+        TheMovieDatabase theMovieDatabase = new TheMovieDatabase();
         String director = null;
         try {
-            director = movieDatabase.getDirectorFromMovie(id[0]);
+            director = theMovieDatabase.getDirectorFromMovie(id[0]);
         } catch (IOException e) {
             e.printStackTrace();
         }

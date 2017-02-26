@@ -1,10 +1,9 @@
 package com.example.nopesal.projectmoviesudacity.tasks;
 
-import android.content.Context;
 import android.os.AsyncTask;
 
 import com.example.nopesal.projectmoviesudacity.MainActivity;
-import com.example.nopesal.projectmoviesudacity.database.MovieDatabase;
+import com.example.nopesal.projectmoviesudacity.database.TheMovieDatabase;
 import com.example.nopesal.projectmoviesudacity.utils.Movie;
 
 import java.io.IOException;
@@ -24,10 +23,10 @@ public class PopularMoviesTask extends AsyncTask<String, Void, ArrayList<Movie>>
 
     @Override
     protected ArrayList<Movie> doInBackground(String... order) {
-        MovieDatabase movieDatabase = new MovieDatabase();
+        TheMovieDatabase theMovieDatabase = new TheMovieDatabase();
         ArrayList<Movie> movieArrayList = new ArrayList<>();
         try {
-            movieArrayList = movieDatabase.getMoviesArray(order[0]);
+            movieArrayList = theMovieDatabase.getMoviesArray(order[0]);
         } catch (IOException e) {
             e.printStackTrace();
         }

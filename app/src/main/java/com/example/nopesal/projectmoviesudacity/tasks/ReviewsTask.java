@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.nopesal.projectmoviesudacity.MovieDetailsActivity;
-import com.example.nopesal.projectmoviesudacity.database.MovieDatabase;
+import com.example.nopesal.projectmoviesudacity.database.TheMovieDatabase;
 import com.example.nopesal.projectmoviesudacity.utils.Review;
 
 import java.io.IOException;
@@ -24,10 +24,10 @@ public class ReviewsTask extends AsyncTask<Integer, Void, ArrayList<Review>> {
 
     @Override
     protected ArrayList<Review> doInBackground(Integer... id) {
-        MovieDatabase movieDatabase = new MovieDatabase();
+        TheMovieDatabase theMovieDatabase = new TheMovieDatabase();
         ArrayList<Review> reviewArrayList = new ArrayList<>();
         try {
-            reviewArrayList = movieDatabase.getMovieReviews(id[0]);
+            reviewArrayList = theMovieDatabase.getMovieReviews(id[0]);
         } catch (IOException e) {
             Log.e("REVIEWS", "doInBackground: Error getting reviews");
             e.printStackTrace();

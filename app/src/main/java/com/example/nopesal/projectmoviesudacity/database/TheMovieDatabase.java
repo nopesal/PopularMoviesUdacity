@@ -22,7 +22,7 @@ import okhttp3.Response;
  * Created by Nico on 27/01/2017.
  */
 
-public class MovieDatabase {
+public class TheMovieDatabase {
     public ArrayList<Movie> getMoviesArray(String order) throws IOException {
         String url = URLGenerator.generateMoviesURL(order);
         String apiResponseJSON = getJSONFromApi(url);

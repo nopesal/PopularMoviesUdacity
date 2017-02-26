@@ -19,6 +19,7 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -29,6 +30,7 @@ import android.widget.TextView;
 
 import com.dgreenhalgh.android.simpleitemdecoration.linear.DividerItemDecoration;
 import com.example.nopesal.projectmoviesudacity.adapters.ReviewListAdapter;
+import com.example.nopesal.projectmoviesudacity.database.FavoriteMoviesDataSource;
 import com.example.nopesal.projectmoviesudacity.database.URLGenerator;
 import com.example.nopesal.projectmoviesudacity.tasks.DirectorTask;
 import com.example.nopesal.projectmoviesudacity.tasks.ReviewsTask;
@@ -67,6 +69,13 @@ public class MovieDetailsActivity extends AppCompatActivity {
     @BindView(R.id.movie_details_reviews_number) TextView mReviewsNumber;
     @BindView(R.id.activity_movie_details) CoordinatorLayout mCoordinatorLayout;
 
+    public Movie mMovie;
+    public String mDirector;
+    public Bitmap mPoster;
+
+    public int mItemsLoadCount = 2;
+    public boolean isFavorited = false;
+
     public interface AsyncTaskCompleteListener<T> {
         public void onTaskCompleted(T result);
     }
@@ -83,6 +92,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 .build()
         );
 
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.movie_details_toolbar);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
@@ -94,17 +104,20 @@ public class MovieDetailsActivity extends AppCompatActivity {
             }
         });
 
-        final Movie movie = getIntent().getExtras().getParcelable("Movie");
-        new DirectorTask(new DirectorTaskCompletedListener()).execute(movie.getId());
-        new TrailerTask(new TrailerTaskCompletedListener()).execute(movie.getId());
-        new ReviewsTask(new ReviewsTaskCompletedListener()).execute(movie.getId());
+        mMovie = getIntent().getExtras().getParcelable("Movie");
+        new DirectorTask(new DirectorTaskCompletedListener()).execute(mMovie.getId());
+        new TrailerTask(new TrailerTaskCompletedListener()).execute(mMovie.getId());
+        new ReviewsTask(new ReviewsTaskCompletedListener()).execute(mMovie.getId());
 
-        String posterPath = URLGenerator.getHDPosterURL(movie.getPosterPath());
+        FavoriteMoviesDataSource dataSource = new FavoriteMoviesDataSource(this);
+        isFavorited = dataSource.isFavorited(mMovie);
+
+        String posterPath = URLGenerator.getHDPosterURL(mMovie.getPosterPath());
         Picasso.with(getApplicationContext()).load(posterPath).into(mMovieDetailsPoster, new Callback() {
             @Override
             public void onSuccess() {
-                Bitmap bitmap = ((BitmapDrawable) mMovieDetailsPoster.getDrawable()).getBitmap();
-                Palette palette = Palette.from(bitmap).generate();
+                mPoster = ((BitmapDrawable) mMovieDetailsPoster.getDrawable()).getBitmap();
+                Palette palette = Palette.from(mPoster).generate();
                 Palette.Swatch vibrantSwatch = palette.getVibrantSwatch();
                 if (vibrantSwatch != null) {
                     applyPaletteColorToViews(vibrantSwatch);
@@ -113,6 +126,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
                     applyPaletteColorToViews(mutedSwatch);
                 }
                 mCoordinatorLayout.setVisibility(View.VISIBLE);
+                mItemsLoadCount--;
             }
 
             @Override
@@ -125,12 +139,13 @@ public class MovieDetailsActivity extends AppCompatActivity {
         Typeface nunitoBold = Typeface.createFromAsset(getAssets(),
                 "fonts/Nunito-Bold.ttf");
         mCollapsingToolbarLayout.setCollapsedTitleTypeface(nunitoBold);
-        mMovieDetailsTitle.setText(movie.getTitle());
-        mMovieDetailsReleaseDate.setText(movie.getReleaseDate().substring(0, 4));
-        mMovieDetailsSynopsis.setText(movie.getSynopsis());
-        mMovieDetailsRating.setText(movie.getRating());
+        mMovieDetailsTitle.setText(mMovie.getTitle());
+        mMovieDetailsReleaseDate.setText(mMovie.getReleaseDate().substring(0, 4));
+        mMovieDetailsSynopsis.setText(mMovie.getSynopsis());
+        mMovieDetailsRating.setText(mMovie.getRating());
 
-        hideTitleWhenExpanded(movie);
+        hideTitleWhenExpanded();
+
     }
 
     private void applyPaletteColorToViews(Palette.Swatch swatch) {
@@ -143,7 +158,11 @@ public class MovieDetailsActivity extends AppCompatActivity {
         mCollapsingToolbarLayout.setContentScrimColor(swatch.getRgb());
         mMovieDetailsRating.setTextColor(swatch.getRgb());
         setStatusBarColor(swatch);
-        setFavoriteButtonColor(swatch);
+        if (isFavorited) {
+            setFavoriteButtonFillColor(swatch);
+        } else {
+            setFavoriteButtonBorderColor(swatch);
+        }
     }
 
     private void setStatusBarColor(Palette.Swatch swatch) {
@@ -155,7 +174,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         window.setStatusBarColor(Color.HSVToColor(hsl));
     }
 
-    private void setFavoriteButtonColor(Palette.Swatch swatch) {
+    private void setFavoriteButtonBorderColor(Palette.Swatch swatch) {
         mFavoriteButtonText.setTextColor(swatch.getRgb());
         mFavoriteButtonImage.setImageTintList(ColorStateList.valueOf(swatch.getRgb()));
 
@@ -164,6 +183,19 @@ public class MovieDetailsActivity extends AppCompatActivity {
         gd.setStroke((int) (1 * getResources().getDisplayMetrics().density), swatch.getRgb());
         mFavoriteButton.setBackground(gd);
 
+        mFavoriteButton.setTag(R.bool.swatch_color_assigned, swatch);
+    }
+
+    private void setFavoriteButtonFillColor(Palette.Swatch swatch) {
+        mFavoriteButtonText.setTextColor(getColor(R.color.detailsGrey));
+        mFavoriteButtonImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.detailsGrey)));
+
+        GradientDrawable gd = new GradientDrawable();
+        gd.setCornerRadius(7 * getResources().getDisplayMetrics().density);
+        gd.setColor(swatch.getRgb());
+        mFavoriteButton.setBackground(gd);
+
+        mFavoriteButtonImage.setImageResource(R.drawable.favorite_button_pressed_icon);
         mFavoriteButton.setTag(R.bool.swatch_color_assigned, swatch);
     }
 
@@ -185,29 +217,29 @@ public class MovieDetailsActivity extends AppCompatActivity {
     @OnClick(R.id.movie_details_favorite_button)
     public void onFavoriteButtonClicked(View view) {
         Palette.Swatch swatch = (Palette.Swatch) mFavoriteButton.getTag(R.bool.swatch_color_assigned);
-        if (mFavoriteButton.getTag(R.bool.favorite_button_pressed) != null && mFavoriteButton.getTag(R.bool.favorite_button_pressed).equals(true)) {
+        final FavoriteMoviesDataSource dataSource = new FavoriteMoviesDataSource(getApplicationContext());
+        if (isFavorited) {
+            Log.i("FAVORITED", "onFavoriteButtonClicked: DELETED");
             mFavoriteButton.setTag(R.bool.favorite_button_pressed, false);
             mFavoriteButtonImage.setImageResource(R.drawable.favorite_button_not_pressed_icon);
-            setFavoriteButtonColor(swatch);
+            setFavoriteButtonBorderColor(swatch);
+            isFavorited = false;
+            dataSource.deleteFavoriteMovie(mMovie);
         } else {
-            GradientDrawable gd = new GradientDrawable();
-            gd.setCornerRadius(7 * getResources().getDisplayMetrics().density);
-            gd.setColor(swatch.getRgb());
-            mFavoriteButton.setBackground(gd);
-            mFavoriteButtonText.setTextColor(getColor(R.color.detailsGrey));
-            mFavoriteButtonImage.setImageResource(R.drawable.favorite_button_pressed_icon);
-            mFavoriteButtonImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.detailsGrey)));
-            mFavoriteButton.setTag(R.bool.favorite_button_pressed, true);
+            setFavoriteButtonFillColor(swatch);
+            if (mItemsLoadCount == 0) {
+                dataSource.insertFavoriteMovie(mMovie, mPoster, mDirector);
+            }
+            isFavorited = true;
         }
     }
+
 
     /**
      * Method that hides the Movie title from the interface when the Scroll View is expanded and
      * shows it when it's collapsed.
-     *
-     * @param movie Object that contains the movie info
      */
-    private void hideTitleWhenExpanded(final Movie movie) {
+    private void hideTitleWhenExpanded() {
         mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             boolean isShow = false;
             int scrollRange = -1;
@@ -218,7 +250,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
                     scrollRange = appBarLayout.getTotalScrollRange();
                 }
                 if (scrollRange + verticalOffset == 0) {
-                    mCollapsingToolbarLayout.setTitle(movie.getTitle());
+                    mCollapsingToolbarLayout.setTitle(mMovie.getTitle());
                     isShow = true;
                 } else if (isShow) {
                     mCollapsingToolbarLayout.setTitle(" ");
@@ -239,6 +271,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
             if (director != null) {
                 showDirectorInPanel();
                 mMovieDetailsDirector.setText(director);
+                mDirector = director;
+                mItemsLoadCount--;
             }
         }
     }
