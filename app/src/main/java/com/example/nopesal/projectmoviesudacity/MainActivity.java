@@ -6,7 +6,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        setTitle("Most popular");
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                 .setDefaultFontPath("fonts/Nunito-Regular.ttf")
@@ -77,16 +77,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.sort_order_menu_option) {
-            if (item.getTitle() == "Top Rated") {
-                item.setTitle("Most Popular");
-                mOrder = "popular";
-            } else {
-                item.setTitle("Top Rated");
-                mOrder = "top_rated";
-            }
-            new PopularMoviesTask(new PopularMoviesTaskCompletedListener()).execute(mOrder);
+        if (item.getItemId() == R.id.sort_order_menu_option_popular) {
+            mOrder = "popular";
+            setTitle("Most popular");
         }
+        if (item.getItemId() == R.id.sort_order_menu_option_rated) {
+            mOrder = "top_rated";
+            setTitle("Best rated");
+        }
+        if (item.getItemId() == R.id.sort_order_menu_option_favorites) {
+            mOrder = "popular";
+            setTitle("Popular Movies");
+        }
+        new PopularMoviesTask(new PopularMoviesTaskCompletedListener()).execute(mOrder);
         if (isNetworkAvailable()) {
             mConnectionErrorMessage.setVisibility(View.GONE);
         } else {

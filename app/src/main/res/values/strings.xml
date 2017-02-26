@@ -11,6 +11,8 @@
     <string name="reviews">REVIEWS</string>
     <string name="tmdb_rating">TMDB RATING</string>
     <string name="loading_reviews">Loading reviews…</string>
+    <string name="best_rated">Best Rated</string>
+    <string name="favorite_movies_string">Favorite Movies</string>
     <plurals name="number_of_reviews">
         <item quantity="one">%d review</item>
         <item quantity="other">%d reviews</item>

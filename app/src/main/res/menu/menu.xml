@@ -3,7 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/sort_order_menu_option"
+        android:id="@+id/sort_order_menu_option_popular"
         android:title="@string/sort_order"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/sort_order_menu_option_rated"
+        android:title="@string/best_rated"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/sort_order_menu_option_favorites"
+        android:title="@string/favorite_movies_string"
+        app:showAsAction="never" />
 </menu>

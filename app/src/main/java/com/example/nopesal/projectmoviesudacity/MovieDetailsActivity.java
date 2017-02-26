@@ -219,7 +219,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
         Palette.Swatch swatch = (Palette.Swatch) mFavoriteButton.getTag(R.bool.swatch_color_assigned);
         final FavoriteMoviesDataSource dataSource = new FavoriteMoviesDataSource(getApplicationContext());
         if (isFavorited) {
-            Log.i("FAVORITED", "onFavoriteButtonClicked: DELETED");
             mFavoriteButton.setTag(R.bool.favorite_button_pressed, false);
             mFavoriteButtonImage.setImageResource(R.drawable.favorite_button_not_pressed_icon);
             setFavoriteButtonBorderColor(swatch);
