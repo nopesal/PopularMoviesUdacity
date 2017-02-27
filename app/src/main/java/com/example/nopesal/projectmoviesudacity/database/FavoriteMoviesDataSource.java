@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import com.example.nopesal.projectmoviesudacity.utils.Movie;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 
 /**
  * Created by nopesal on 23/02/2017.
@@ -48,11 +49,6 @@ public class FavoriteMoviesDataSource {
         return cursor.getString(columnIndex);
     }
 
-    private double getDoubleFromColumnName(Cursor cursor, String columnName) {
-        int columnIndex = cursor.getColumnIndex(columnName);
-        return cursor.getDouble(columnIndex);
-    }
-
     private byte[] getByteArrayFromColumnName(Cursor cursor, String columnName) {
         int columnIndex = cursor.getColumnIndex(columnName);
         return cursor.getBlob(columnIndex);
@@ -70,6 +66,7 @@ public class FavoriteMoviesDataSource {
         values.put(MovieSQLiteHelper.COLUMN_RELEASE_DATE, movie.getReleaseDate());
         values.put(MovieSQLiteHelper.COLUMN_SYNOPSIS, movie.getSynopsis());
         values.put(MovieSQLiteHelper.COLUMN_TITLE, movie.getTitle());
+        values.put(MovieSQLiteHelper.COLUMN_POSTER_PATH, movie.getPosterPath());
 
         database.insert(MovieSQLiteHelper.TABLENAME_FAVORITE_MOVIES, null, values);
 
@@ -89,38 +86,6 @@ public class FavoriteMoviesDataSource {
         close(database);
     }
 
-    public Movie getFavoriteMovie(int id) {
-        SQLiteDatabase database = open();
-
-        Cursor cursor = database.query(
-                MovieSQLiteHelper.TABLENAME_FAVORITE_MOVIES,
-                new String[]{
-                        MovieSQLiteHelper.COLUMN_ID,
-                        MovieSQLiteHelper.COLUMN_RATING,
-                        MovieSQLiteHelper.COLUMN_RELEASE_DATE,
-                        MovieSQLiteHelper.COLUMN_SYNOPSIS,
-                        MovieSQLiteHelper.COLUMN_TITLE},
-                MovieSQLiteHelper.COLUMN_ID + " = ?", //select
-                new String[]{String.valueOf(id)}, //select args
-                null, //group by
-                null, //having
-                null //order by
-        );
-        cursor.moveToFirst();
-
-        Movie movie = new Movie(
-                getIntFromColumnName(cursor, MovieSQLiteHelper.COLUMN_ID),
-                getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_TITLE),
-                getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_SYNOPSIS),
-                getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_RATING),
-                getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_RELEASE_DATE),
-                null //unnesesary poster path when offline?
-        );
-
-        cursor.close();
-        close(database);
-        return movie;
-    }
 
     public Bitmap getPoster(int id) {
         SQLiteDatabase database = open();
@@ -187,4 +152,43 @@ public class FavoriteMoviesDataSource {
         return true;
     }
 
+    public ArrayList<Movie> getFavoriteMoviesArray() {
+        SQLiteDatabase database = open();
+
+        Cursor cursor = database.query(
+                MovieSQLiteHelper.TABLENAME_FAVORITE_MOVIES,
+                new String[]{
+                        MovieSQLiteHelper.COLUMN_ID,
+                        MovieSQLiteHelper.COLUMN_POSTER,
+                        MovieSQLiteHelper.COLUMN_DIRECTOR,
+                        MovieSQLiteHelper.COLUMN_RATING,
+                        MovieSQLiteHelper.COLUMN_RELEASE_DATE,
+                        MovieSQLiteHelper.COLUMN_SYNOPSIS,
+                        MovieSQLiteHelper.COLUMN_TITLE,
+                        MovieSQLiteHelper.COLUMN_POSTER_PATH
+                },
+                null,
+                null,
+                null, //group by
+                null, //having
+                null //order by
+        );
+        ArrayList<Movie> movieArrayList = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            do {
+                Movie movie = new Movie(
+                        getIntFromColumnName(cursor, MovieSQLiteHelper.COLUMN_ID),
+                        getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_TITLE),
+                        getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_SYNOPSIS),
+                        getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_RATING),
+                        getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_RELEASE_DATE),
+                        getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_POSTER_PATH)
+                );
+                movieArrayList.add(movie);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        close(database);
+        return movieArrayList;
+    }
 }

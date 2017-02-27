@@ -21,6 +21,7 @@ public class MovieSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_RELEASE_DATE = "RELEASE_DATE";
     public static final String COLUMN_SYNOPSIS = "SYNOPSIS";
     public static final String COLUMN_TITLE = "TITLE";
+    public static final String COLUMN_POSTER_PATH = "POSTER_PATH";
 
     public static final String CREATE_FAVORITE_MOVIES =
             "CREATE TABLE " + TABLENAME_FAVORITE_MOVIES + " (" +
@@ -30,7 +31,8 @@ public class MovieSQLiteHelper extends SQLiteOpenHelper {
                     COLUMN_RATING + " REAL, " +
                     COLUMN_RELEASE_DATE + " TEXT, " +
                     COLUMN_SYNOPSIS + " TEXT, " +
-                    COLUMN_TITLE + " TEXT" +
+                    COLUMN_TITLE + " TEXT, " +
+                    COLUMN_POSTER_PATH + " TEXT" +
                     ")";
 
     public MovieSQLiteHelper(Context context) {

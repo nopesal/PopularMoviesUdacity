@@ -14,6 +14,7 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 import com.example.nopesal.projectmoviesudacity.adapters.MovieGridAdapter;
+import com.example.nopesal.projectmoviesudacity.database.FavoriteMoviesDataSource;
 import com.example.nopesal.projectmoviesudacity.tasks.PopularMoviesTask;
 import com.example.nopesal.projectmoviesudacity.utils.Movie;
 
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     public ArrayList<Movie> mMovieArrayList;
     public String mOrder = "popular";
+    private MovieGridAdapter mMovieGridAdapter;
 
     public interface AsyncTaskCompleteListener<T> {
         public void onTaskCompleted(T result);
@@ -80,20 +82,25 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.sort_order_menu_option_popular) {
             mOrder = "popular";
             setTitle("Most popular");
+            new PopularMoviesTask(new PopularMoviesTaskCompletedListener()).execute(mOrder);
         }
         if (item.getItemId() == R.id.sort_order_menu_option_rated) {
             mOrder = "top_rated";
             setTitle("Best rated");
+            new PopularMoviesTask(new PopularMoviesTaskCompletedListener()).execute(mOrder);
         }
         if (item.getItemId() == R.id.sort_order_menu_option_favorites) {
-            mOrder = "popular";
-            setTitle("Popular Movies");
+            mMovieArrayList = new FavoriteMoviesDataSource(this).getFavoriteMoviesArray();
+            mMovieGridAdapter = new MovieGridAdapter(getApplicationContext(), mMovieArrayList);
+            mGridView.setAdapter(mMovieGridAdapter);
+            setTitle("Favorite movies");
         }
-        new PopularMoviesTask(new PopularMoviesTaskCompletedListener()).execute(mOrder);
-        if (isNetworkAvailable()) {
+        if (isNetworkAvailable() || getTitle().equals("Favorite movies")) {
             mConnectionErrorMessage.setVisibility(View.GONE);
         } else {
             mConnectionErrorMessage.setVisibility(View.VISIBLE);
+            mMovieGridAdapter = new MovieGridAdapter(getApplicationContext(), new ArrayList<Movie>());
+            mGridView.setAdapter(mMovieGridAdapter);
         }
         return true;
     }
@@ -115,8 +122,8 @@ public class MainActivity extends AppCompatActivity {
         public void onTaskCompleted(ArrayList<Movie> movies) {
             if (!movies.isEmpty()) {
                 mMovieArrayList = movies;
-                final MovieGridAdapter adapter = new MovieGridAdapter(getApplicationContext(), mMovieArrayList);
-                mGridView.setAdapter(adapter);
+                mMovieGridAdapter = new MovieGridAdapter(getApplicationContext(), mMovieArrayList);
+                mGridView.setAdapter(mMovieGridAdapter);
             }
         }
     }

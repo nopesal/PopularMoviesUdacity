@@ -8,6 +8,8 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -105,36 +107,38 @@ public class MovieDetailsActivity extends AppCompatActivity {
         });
 
         mMovie = getIntent().getExtras().getParcelable("Movie");
-        new DirectorTask(new DirectorTaskCompletedListener()).execute(mMovie.getId());
-        new TrailerTask(new TrailerTaskCompletedListener()).execute(mMovie.getId());
-        new ReviewsTask(new ReviewsTaskCompletedListener()).execute(mMovie.getId());
 
         FavoriteMoviesDataSource dataSource = new FavoriteMoviesDataSource(this);
         isFavorited = dataSource.isFavorited(mMovie);
 
-        String posterPath = URLGenerator.getHDPosterURL(mMovie.getPosterPath());
-        Picasso.with(getApplicationContext()).load(posterPath).into(mMovieDetailsPoster, new Callback() {
-            @Override
-            public void onSuccess() {
-                mPoster = ((BitmapDrawable) mMovieDetailsPoster.getDrawable()).getBitmap();
-                Palette palette = Palette.from(mPoster).generate();
-                Palette.Swatch vibrantSwatch = palette.getVibrantSwatch();
-                if (vibrantSwatch != null) {
-                    applyPaletteColorToViews(vibrantSwatch);
-                } else {
-                    Palette.Swatch mutedSwatch = palette.getMutedSwatch();
-                    applyPaletteColorToViews(mutedSwatch);
+        if (!isFavorited){
+            new DirectorTask(new DirectorTaskCompletedListener()).execute(mMovie.getId());
+            new TrailerTask(new TrailerTaskCompletedListener()).execute(mMovie.getId());
+            new ReviewsTask(new ReviewsTaskCompletedListener()).execute(mMovie.getId());
+
+            String posterPath = URLGenerator.getHDPosterURL(mMovie.getPosterPath());
+            Picasso.with(getApplicationContext()).load(posterPath).into(mMovieDetailsPoster, new Callback() {
+                @Override
+                public void onSuccess() {
+                    extractColorsFromPoster();
                 }
-                mCoordinatorLayout.setVisibility(View.VISIBLE);
-                mItemsLoadCount--;
-            }
 
-            @Override
-            public void onError() {
-                mCoordinatorLayout.setVisibility(View.VISIBLE);
+                @Override
+                public void onError() {
+                    mCoordinatorLayout.setVisibility(View.VISIBLE);
+                }
+            });
+        } else {
+            showDirectorInPanel(dataSource.getDirector(mMovie.getId()));
+            mMovieDetailsPoster.setImageBitmap(dataSource.getPoster(mMovie.getId()));
+            extractColorsFromPoster();
+            if (!isNetworkAvailable()){
+                mReviewsNumber.setText(R.string.reviews_offline);
+            } else {
+                new TrailerTask(new TrailerTaskCompletedListener()).execute(mMovie.getId());
+                new ReviewsTask(new ReviewsTaskCompletedListener()).execute(mMovie.getId());
             }
-        });
-
+        }
 
         Typeface nunitoBold = Typeface.createFromAsset(getAssets(),
                 "fonts/Nunito-Bold.ttf");
@@ -146,6 +150,20 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         hideTitleWhenExpanded();
 
+    }
+
+    private void extractColorsFromPoster() {
+        mPoster = ((BitmapDrawable) mMovieDetailsPoster.getDrawable()).getBitmap();
+        Palette palette = Palette.from(mPoster).generate();
+        Palette.Swatch vibrantSwatch = palette.getVibrantSwatch();
+        if (vibrantSwatch != null) {
+            applyPaletteColorToViews(vibrantSwatch);
+        } else {
+            Palette.Swatch mutedSwatch = palette.getMutedSwatch();
+            applyPaletteColorToViews(mutedSwatch);
+        }
+        mCoordinatorLayout.setVisibility(View.VISIBLE);
+        mItemsLoadCount--;
     }
 
     private void applyPaletteColorToViews(Palette.Swatch swatch) {
@@ -199,9 +217,12 @@ public class MovieDetailsActivity extends AppCompatActivity {
         mFavoriteButton.setTag(R.bool.swatch_color_assigned, swatch);
     }
 
-    private void showDirectorInPanel() {
+    private void showDirectorInPanel(String director) {
         mDirectedByTextView.setVisibility(View.VISIBLE);
         mMovieDetailsDirector.setVisibility(View.VISIBLE);
+        mMovieDetailsDirector.setText(director);
+        mDirector = director;
+        mItemsLoadCount--;
     }
 
     private void assignTargetToMovieTrailerButton(final String youtubeURL) {
@@ -259,6 +280,18 @@ public class MovieDetailsActivity extends AppCompatActivity {
         });
     }
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+
+        boolean isAvailable = false;
+        if (networkInfo != null && networkInfo.isConnected()) {
+            isAvailable = true;
+
+        }
+        return isAvailable;
+    }
+
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
@@ -268,10 +301,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         @Override
         public void onTaskCompleted(String director) {
             if (director != null) {
-                showDirectorInPanel();
-                mMovieDetailsDirector.setText(director);
-                mDirector = director;
-                mItemsLoadCount--;
+                showDirectorInPanel(director);
             }
         }
     }
