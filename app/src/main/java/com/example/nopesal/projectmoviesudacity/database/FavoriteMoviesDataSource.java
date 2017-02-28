@@ -130,7 +130,19 @@ public class FavoriteMoviesDataSource {
         return director;
     }
 
-    public boolean isFavorited(Movie movie){
+    public String setDirector(Movie movie, String director) {
+        SQLiteDatabase database = open();
+
+        String strSQL = "UPDATE " + MovieSQLiteHelper.TABLENAME_FAVORITE_MOVIES +
+                " SET " + MovieSQLiteHelper.COLUMN_DIRECTOR + " = '" + director +
+                "' WHERE " + MovieSQLiteHelper.COLUMN_ID + " = " + String.valueOf(movie.getId());
+
+        database.execSQL(strSQL);
+        close(database);
+        return director;
+    }
+
+    public boolean isFavorited(Movie movie) {
         SQLiteDatabase database = open();
 
         Cursor cursor = database.query(
@@ -142,7 +154,7 @@ public class FavoriteMoviesDataSource {
                 null, //having
                 null //order by
         );
-        if(cursor.getCount() <= 0){
+        if (cursor.getCount() <= 0) {
             cursor.close();
             close(database);
             return false;

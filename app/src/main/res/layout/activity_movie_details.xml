@@ -6,8 +6,8 @@
                                                  android:layout_width="match_parent"
                                                  android:layout_height="match_parent"
                                                  android:visibility="invisible"
-                                                 tools:visibility="visible"
-                                                 tools:context="com.example.nopesal.projectmoviesudacity.MovieDetailsActivity">
+                                                 tools:context="com.example.nopesal.projectmoviesudacity.MovieDetailsActivity"
+                                                 tools:visibility="visible">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
@@ -126,10 +126,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="25dp"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="25dp"
                 android:orientation="horizontal">
 
                 <Button
@@ -211,7 +211,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="25dp"
                 android:orientation="horizontal"
                 android:paddingEnd="@dimen/horizontal_padding"
                 android:paddingStart="@dimen/horizontal_padding">
@@ -281,10 +281,10 @@
                 android:id="@+id/movie_details_review_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
                 android:paddingBottom="?attr/actionBarSize"
-                android:layout_marginBottom="@dimen/activity_vertical_margin"
                 tools:visibility="gone"/>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

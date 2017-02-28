@@ -72,10 +72,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
     @BindView(R.id.activity_movie_details) CoordinatorLayout mCoordinatorLayout;
 
     public Movie mMovie;
-    public String mDirector;
-    public Bitmap mPoster;
+    public String mDirector = "";
+    public Bitmap mPoster = null;
 
-    public int mItemsLoadCount = 2;
     public boolean isFavorited = false;
 
     public interface AsyncTaskCompleteListener<T> {
@@ -111,7 +110,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         FavoriteMoviesDataSource dataSource = new FavoriteMoviesDataSource(this);
         isFavorited = dataSource.isFavorited(mMovie);
 
-        if (!isFavorited){
+        if (!isFavorited) {
             new DirectorTask(new DirectorTaskCompletedListener()).execute(mMovie.getId());
             new TrailerTask(new TrailerTaskCompletedListener()).execute(mMovie.getId());
             new ReviewsTask(new ReviewsTaskCompletedListener()).execute(mMovie.getId());
@@ -132,7 +131,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
             showDirectorInPanel(dataSource.getDirector(mMovie.getId()));
             mMovieDetailsPoster.setImageBitmap(dataSource.getPoster(mMovie.getId()));
             extractColorsFromPoster();
-            if (!isNetworkAvailable()){
+            if (!isNetworkAvailable()) {
                 mReviewsNumber.setText(R.string.reviews_offline);
             } else {
                 new TrailerTask(new TrailerTaskCompletedListener()).execute(mMovie.getId());
@@ -163,7 +162,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
             applyPaletteColorToViews(mutedSwatch);
         }
         mCoordinatorLayout.setVisibility(View.VISIBLE);
-        mItemsLoadCount--;
     }
 
     private void applyPaletteColorToViews(Palette.Swatch swatch) {
@@ -222,7 +220,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
         mMovieDetailsDirector.setVisibility(View.VISIBLE);
         mMovieDetailsDirector.setText(director);
         mDirector = director;
-        mItemsLoadCount--;
     }
 
     private void assignTargetToMovieTrailerButton(final String youtubeURL) {
@@ -247,9 +244,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
             dataSource.deleteFavoriteMovie(mMovie);
         } else {
             setFavoriteButtonFillColor(swatch);
-            if (mItemsLoadCount == 0) {
-                dataSource.insertFavoriteMovie(mMovie, mPoster, mDirector);
-            }
+            dataSource.insertFavoriteMovie(mMovie, mPoster, mDirector);
             isFavorited = true;
         }
     }
@@ -302,6 +297,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         public void onTaskCompleted(String director) {
             if (director != null) {
                 showDirectorInPanel(director);
+                new FavoriteMoviesDataSource(getApplicationContext()).setDirector(mMovie, director);
             }
         }
     }
