@@ -2,6 +2,7 @@ package com.example.nopesal.projectmoviesudacity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
@@ -51,7 +52,31 @@ public class MainActivity extends AppCompatActivity {
                 .build()
         );
 
-        new PopularMoviesTask(new PopularMoviesTaskCompletedListener()).execute(mOrder);
+        if (savedInstanceState == null){
+            SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+            String optionSelected = sharedPreferences.getString("sortOptionSelected", null);
+            if (optionSelected != null) {
+                switch (optionSelected) {
+                    case "Best rated":
+                        mOrder = "top_rated";
+                        setTitle("Best rated");
+                        new PopularMoviesTask(new PopularMoviesTaskCompletedListener()).execute(mOrder);
+                        break;
+                    case "Favorite movies":
+                        mMovieArrayList = new FavoriteMoviesDataSource(this).getFavoriteMoviesArray();
+                        mMovieGridAdapter = new MovieGridAdapter(getApplicationContext(), mMovieArrayList);
+                        mGridView.setAdapter(mMovieGridAdapter);
+                        setTitle("Favorite movies");
+                        break;
+                    default:
+                        new PopularMoviesTask(new PopularMoviesTaskCompletedListener()).execute(mOrder);
+                        break;
+                }
+            } else {
+                new PopularMoviesTask(new PopularMoviesTaskCompletedListener()).execute(mOrder);
+            }
+
+        }
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -115,6 +140,31 @@ public class MainActivity extends AppCompatActivity {
 
         }
         return isAvailable;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt("gridScrollPosition", mGridView.getFirstVisiblePosition());
+        outState.putString("sortOptionSelected", (String) getTitle());
+        outState.putParcelableArrayList("movieArrayList", mMovieArrayList);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        setTitle(savedInstanceState.getString("sortOptionSelected"));
+        mMovieArrayList = savedInstanceState.getParcelableArrayList("movieArrayList");
+        mMovieGridAdapter = new MovieGridAdapter(this, mMovieArrayList);
+        mGridView.setAdapter(mMovieGridAdapter);
+        mGridView.setSelection(savedInstanceState.getInt("gridScrollPosition"));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+        sharedPreferences.edit().putString("sortOptionSelected", (String) getTitle()).apply();
     }
 
     public class PopularMoviesTaskCompletedListener implements AsyncTaskCompleteListener<ArrayList<Movie>> {
