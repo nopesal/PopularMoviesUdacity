@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,10 +31,11 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.movie_grid_view) GridView mGridView;
     @BindView(R.id.connection_error_message) TextView mConnectionErrorMessage;
-
     public ArrayList<Movie> mMovieArrayList;
+
     public String mOrder = "popular";
     private MovieGridAdapter mMovieGridAdapter;
+    private static final int HAS_BEEN_FAVORITED = 0;
 
     public interface AsyncTaskCompleteListener<T> {
         public void onTaskCompleted(T result);
@@ -165,6 +167,16 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
         sharedPreferences.edit().putString("sortOptionSelected", (String) getTitle()).apply();
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (getTitle().equals("Favorite movies"))
+        mMovieArrayList = new FavoriteMoviesDataSource(this).getFavoriteMoviesArray();
+        mMovieGridAdapter = new MovieGridAdapter(getApplicationContext(), mMovieArrayList);
+        mGridView.setAdapter(mMovieGridAdapter);
     }
 
     public class PopularMoviesTaskCompletedListener implements AsyncTaskCompleteListener<ArrayList<Movie>> {
