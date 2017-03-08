@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.util.Log;
 
 import com.example.nopesal.projectmoviesudacity.utils.Movie;
 
@@ -18,19 +20,9 @@ import java.util.ArrayList;
 
 public class FavoriteMoviesDataSource {
     private Context mContext;
-    private MovieSQLiteHelper mMovieSQLiteHelper;
 
     public FavoriteMoviesDataSource(Context context) {
         mContext = context;
-        mMovieSQLiteHelper = new MovieSQLiteHelper(context);
-    }
-
-    public SQLiteDatabase open() {
-        return mMovieSQLiteHelper.getWritableDatabase();
-    }
-
-    public void close(SQLiteDatabase database) {
-        database.close();
     }
 
     public static byte[] getBytes(Bitmap bitmap) {
@@ -55,9 +47,6 @@ public class FavoriteMoviesDataSource {
     }
 
     public void insertFavoriteMovie(Movie movie, Bitmap poster, String director) {
-        SQLiteDatabase database = open();
-        database.beginTransaction();
-
         ContentValues values = new ContentValues();
         values.put(MovieSQLiteHelper.COLUMN_ID, movie.getId());
         values.put(MovieSQLiteHelper.COLUMN_POSTER, getBytes(poster));
@@ -68,139 +57,84 @@ public class FavoriteMoviesDataSource {
         values.put(MovieSQLiteHelper.COLUMN_TITLE, movie.getTitle());
         values.put(MovieSQLiteHelper.COLUMN_POSTER_PATH, movie.getPosterPath());
 
-        database.insert(MovieSQLiteHelper.TABLENAME_FAVORITE_MOVIES, null, values);
-
-        database.setTransactionSuccessful();
-        database.endTransaction();
-        close(database);
+        Uri uri = FavoriteMoviesContract.CONTENT_URI.buildUpon().appendPath(String.valueOf(movie.getId())).build();
+        mContext.getContentResolver().insert(uri, values);
     }
 
     public void deleteFavoriteMovie(Movie movie) {
-        SQLiteDatabase database = open();
-        database.beginTransaction();
-
-        database.delete(MovieSQLiteHelper.TABLENAME_FAVORITE_MOVIES, MovieSQLiteHelper.COLUMN_ID + " = ?", new String[]{String.valueOf(movie.getId())});
-
-        database.setTransactionSuccessful();
-        database.endTransaction();
-        close(database);
+        Uri uri = FavoriteMoviesContract.CONTENT_URI.buildUpon().appendPath(String.valueOf(movie.getId())).build();
+        mContext.getContentResolver().delete(uri, null, null);
     }
 
 
     public Bitmap getPoster(int id) {
-        SQLiteDatabase database = open();
-
-        Cursor cursor = database.query(
-                MovieSQLiteHelper.TABLENAME_FAVORITE_MOVIES,
-                new String[]{MovieSQLiteHelper.COLUMN_POSTER},
-                MovieSQLiteHelper.COLUMN_ID + " = ?", //select
-                new String[]{String.valueOf(id)}, //select args
-                null, //group by
-                null, //having
-                null //order by
-        );
-        cursor.moveToFirst();
-
-        byte[] blob = getByteArrayFromColumnName(cursor, MovieSQLiteHelper.COLUMN_POSTER);
-        Bitmap poster = BitmapFactory.decodeByteArray(blob, 0, blob.length);
-
-        cursor.close();
-        close(database);
+        Bitmap poster = null;
+        Uri uri = FavoriteMoviesContract.CONTENT_URI.buildUpon().appendPath(String.valueOf(id)).build();
+        Cursor cursor = mContext.getContentResolver().query(uri, new String[]{MovieSQLiteHelper.COLUMN_POSTER}, null, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            byte[] blob = getByteArrayFromColumnName(cursor, MovieSQLiteHelper.COLUMN_POSTER);
+            poster = BitmapFactory.decodeByteArray(blob, 0, blob.length);
+            cursor.close();
+        }
         return poster;
     }
 
     public String getDirector(int id) {
-        SQLiteDatabase database = open();
-
-        Cursor cursor = database.query(
-                MovieSQLiteHelper.TABLENAME_FAVORITE_MOVIES,
-                new String[]{MovieSQLiteHelper.COLUMN_DIRECTOR},
-                MovieSQLiteHelper.COLUMN_ID + " = ?", //select
-                new String[]{String.valueOf(id)}, //select args
-                null, //group by
-                null, //having
-                null //order by
-        );
-        cursor.moveToFirst();
-
-        String director = getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_DIRECTOR);
-
-        cursor.close();
-        close(database);
+        String director = "";
+        Uri uri = FavoriteMoviesContract.CONTENT_URI.buildUpon().appendPath(String.valueOf(id)).build();
+        Cursor cursor = mContext.getContentResolver().query(uri, new String[]{MovieSQLiteHelper.COLUMN_DIRECTOR}, null, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            director = getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_DIRECTOR);
+            cursor.close();
+        }
         return director;
     }
 
     public String setDirector(Movie movie, String director) {
-        SQLiteDatabase database = open();
-
-        String strSQL = "UPDATE " + MovieSQLiteHelper.TABLENAME_FAVORITE_MOVIES +
-                " SET " + MovieSQLiteHelper.COLUMN_DIRECTOR + " = '" + director +
-                "' WHERE " + MovieSQLiteHelper.COLUMN_ID + " = " + String.valueOf(movie.getId());
-
-        database.execSQL(strSQL);
-        close(database);
+        Uri uri = FavoriteMoviesContract.CONTENT_URI.buildUpon().appendPath(String.valueOf(movie.getId())).build();
+        ContentValues values = new ContentValues();
+        values.put(MovieSQLiteHelper.COLUMN_DIRECTOR, director);
+        mContext.getContentResolver().update(uri, values, null, null);
         return director;
     }
 
     public boolean isFavorited(Movie movie) {
-        SQLiteDatabase database = open();
-
-        Cursor cursor = database.query(
-                MovieSQLiteHelper.TABLENAME_FAVORITE_MOVIES,
-                new String[]{MovieSQLiteHelper.COLUMN_TITLE},
-                MovieSQLiteHelper.COLUMN_ID + " = ?", //select
-                new String[]{String.valueOf(movie.getId())}, //select args
-                null, //group by
-                null, //having
-                null //order by
-        );
-        if (cursor.getCount() <= 0) {
+        Uri uri = FavoriteMoviesContract.CONTENT_URI.buildUpon().appendPath(String.valueOf(movie.getId())).build();
+        Log.i("CONTROLURI", "isFavorited: " + uri.toString());
+        Cursor cursor = mContext.getContentResolver().query(uri, null, null, null, null);
+        if (cursor != null) {
+            if (cursor.getCount() <= 0) {
+                cursor.close();
+                return false;
+            }
             cursor.close();
-            close(database);
-            return false;
+            return true;
         }
-        cursor.close();
-        close(database);
-        return true;
+        return false;
     }
 
     public ArrayList<Movie> getFavoriteMoviesArray() {
-        SQLiteDatabase database = open();
-
-        Cursor cursor = database.query(
-                MovieSQLiteHelper.TABLENAME_FAVORITE_MOVIES,
-                new String[]{
-                        MovieSQLiteHelper.COLUMN_ID,
-                        MovieSQLiteHelper.COLUMN_POSTER,
-                        MovieSQLiteHelper.COLUMN_DIRECTOR,
-                        MovieSQLiteHelper.COLUMN_RATING,
-                        MovieSQLiteHelper.COLUMN_RELEASE_DATE,
-                        MovieSQLiteHelper.COLUMN_SYNOPSIS,
-                        MovieSQLiteHelper.COLUMN_TITLE,
-                        MovieSQLiteHelper.COLUMN_POSTER_PATH
-                },
-                null,
-                null,
-                null, //group by
-                null, //having
-                null //order by
-        );
+        Uri uri = FavoriteMoviesContract.CONTENT_URI;
+        Cursor cursor = mContext.getContentResolver().query(uri, null, null, null, null);
         ArrayList<Movie> movieArrayList = new ArrayList<>();
-        if (cursor.moveToFirst()) {
-            do {
-                Movie movie = new Movie(
-                        getIntFromColumnName(cursor, MovieSQLiteHelper.COLUMN_ID),
-                        getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_TITLE),
-                        getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_SYNOPSIS),
-                        getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_RATING),
-                        getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_RELEASE_DATE),
-                        getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_POSTER_PATH)
-                );
-                movieArrayList.add(movie);
-            } while (cursor.moveToNext());
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    Movie movie = new Movie(
+                            getIntFromColumnName(cursor, MovieSQLiteHelper.COLUMN_ID),
+                            getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_TITLE),
+                            getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_SYNOPSIS),
+                            getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_RATING),
+                            getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_RELEASE_DATE),
+                            getStringFromColumnName(cursor, MovieSQLiteHelper.COLUMN_POSTER_PATH)
+                    );
+                    movieArrayList.add(movie);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
         }
-        cursor.close();
-        close(database);
         return movieArrayList;
     }
 }

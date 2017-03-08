@@ -23,6 +23,10 @@
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
         </activity>
-    </application>
 
+        <provider
+            android:name="com.example.nopesal.projectmoviesudacity.database.FavoriteMoviesContentProvider"
+            android:authorities="com.example.nopesal.projectmoviesudacity"
+            android:exported="false"/>
+    </application>
 </manifest>
