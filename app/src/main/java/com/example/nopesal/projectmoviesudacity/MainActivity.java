@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                 .build()
         );
 
-        if (savedInstanceState == null){
+        if (savedInstanceState == null) {
             SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
             String optionSelected = sharedPreferences.getString("sortOptionSelected", null);
             if (optionSelected != null) {
@@ -173,10 +173,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (getTitle().equals("Favorite movies"))
-        mMovieArrayList = new FavoriteMoviesDataSource(this).getFavoriteMoviesArray();
-        mMovieGridAdapter = new MovieGridAdapter(getApplicationContext(), mMovieArrayList);
-        mGridView.setAdapter(mMovieGridAdapter);
+        if (getTitle().equals("Favorite movies")) {
+            mMovieArrayList = new FavoriteMoviesDataSource(this).getFavoriteMoviesArray();
+            mMovieGridAdapter = new MovieGridAdapter(getApplicationContext(), mMovieArrayList);
+            mGridView.setAdapter(mMovieGridAdapter);
+        }
     }
 
     public class PopularMoviesTaskCompletedListener implements AsyncTaskCompleteListener<ArrayList<Movie>> {
