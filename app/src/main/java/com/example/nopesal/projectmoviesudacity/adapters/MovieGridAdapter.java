@@ -29,7 +29,11 @@ public class MovieGridAdapter extends BaseAdapter {
 
     public MovieGridAdapter(Context mContext, ArrayList<Movie> mMovieArray) {
         this.mContext = mContext;
-        this.mMovieArray = mMovieArray;
+        if (mMovieArray != null){
+            this.mMovieArray = mMovieArray;
+        } else {
+            this.mMovieArray = new ArrayList<>();
+        }
     }
 
     @Override
